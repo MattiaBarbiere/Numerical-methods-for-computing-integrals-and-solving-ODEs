@@ -1,0 +1,27 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Numerical Method for ODE's
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Mattia Nino
+    family-names: Barbiere
+    email: barbiere.mattia@gmail.com
+identifiers:
+  - type: url
+    value: >-
+      https://github.com/MattiaBarbiere/Numerical-Method-for-ODE-s/blob/main/Examples.ipynb
+    description: >-
+      Python notebook with implementation of numerical
+      methods
+repository-code: >-
+  https://github.com/MattiaBarbiere/Numerical-Method-for-ODE-s
+abstract: >-
+  Python notebook containing the implementation of numerical
+  methods presented as part of Mattia Barbiere bachelor
+  thesis of Mathematical and Computing science for
+  Artificial Intelligence at Bocconi University.
