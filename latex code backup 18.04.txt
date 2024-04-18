@@ -17,24 +17,25 @@
 
 \usepackage{geometry}
 \geometry{left=2.5cm, right=2.5cm}
-%Package to display line numbers
-%\usepackage{lineno}
-%\linenumbers
+
 
 
 % %---------
-\usepackage[pagewise]{lineno} % Per numerare le righe
-\usepackage{setspace} % Per regolare l'interlinea
+\usepackage[pagewise]{lineno} % For numbering the lines pagewise
+%\linenumbers
+\usepackage{setspace} % To change the line spacing
 
 
-% Imposta la lunghezza delle righe a 26 righe per pagina
-% \newlength{\linelength}
-% \setlength{\linelength}{\dimexpr(\textheight-2\baselineskip)/30\relax}
-% \setlength{\parindent}{0pt} % Rimuove l'indentazione dei paragrafi
-% %this is a comment
+%Setting 30 lines per page
+\newlength{\linelength}
+\setlength{\linelength}{\dimexpr(\textheight-2\baselineskip)/30\relax}
+\setlength{\parindent}{0pt} % Remove the paragraph indentation
 
-% % Imposta l'interlinea a 30 righe
-% \linespread{\linelength\baselineskip}
+% Setting the line spacing
+\linespread{\linelength\baselineskip}
+
+%Reducing the space before and after equations
+\setdisplayskipstretch{1}
 
 %------------
 
@@ -54,7 +55,7 @@
 \renewcommand{\qed}{\hfill$\blacksquare$}
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\tx}[1]{\quad \text{#1} \quad}
-\newcommand{\lb}[1]{\if\relax\detokenize{#1}\relax{\nonumber}\else{\label{#1}}\fi}
+%\newcommand{\lb}[1]{\if\relax\detokenize{#1}\relax{\nonumber}\else{\label{#1}}\fi}
 
 %Equation number depends on secton
 \numberwithin{equation}{section}
@@ -86,7 +87,7 @@
 %---------------------------Introduction----------------------------------
 
 \section{Introduction}
-Integrals and differential equations are vital tool used throughout mathematics. In particular, they are essential in many modeling real world problems throughout scientific disciplines. When we try to apply these tools in practice, however, we encounter some difficulties as it is often the case that no analytical solutions can be computed. This problem gave rise to Numerical Analysis which tries to approximate the correct value without needing an explicit solution to the problem. With the theoretical basis of this branch of mathematics we also gained methods to instruct computer to solve these problems for us. For this reason I have implemented all the methods in this paper in Python available at \url{https://github.com/MattiaBarbiere/Numerical-Method-for-ODE-s/blob/main/Examples.ipynb} where you can find also many plots, some of which are not include in the paper.
+Integrals and differential equations are vital tool used throughout mathematics. In particular, they are essential in many modeling real world problems throughout scientific disciplines. When we try to apply these tools in practice, however, we encounter some difficulties as it is often the case that no analytical solutions can be computed. This problem gave rise to Numerical Analysis which tries to approximate the correct value without needing an explicit solution to the problem. With the theoretical basis of this branch of mathematics we also gained methods to instruct computer to solve these problems for us. For this reason alongside this paper I wrote Python code available at \cite{Barbiere_Numerical_Method_for} where you can find all the graphs and plots used in this paper together with other illustrations that were not be included.
 
 With this objective in mind, I present this paper as an introductory dive into some important aspect of Numerical Analysis, with a particular emphasis on analyzing methods to solve integrals and differential equations. In Section \ref{section_integrals} we will see that these two concepts often go hand in hand, which leads to many similarities between numerical methods. Before starting with the methods I will devote some time to polynomial interpolation which is at the heart of the derivation of many numerical methods.
 
@@ -161,7 +162,7 @@ Many of the numerical method I will cover start from a polynomial interpolation 
     for some $\eta_x \in [a,b].$
 \end{thm}
 \begin{proof}
-    TODO
+    A proof of this theorem can be found in \cite{gautschi2011numerical}
 \end{proof}
 
 Let's take a better look at \eqref{Err_interpolation}. The first term we see is the (n+1)-th derivative. As we are working with a compact interval we can easily bound this by taking the $\max_{x \in [a,b]} |f^{(n+1)}(x)|$. As we decrease the subinterval size this value may decrease or stay the same depending on the function.\\
@@ -186,7 +187,7 @@ Consider the interval $[-5,5]$ and the following $C^{\infty}([-5,5])$ function o
 \begin{equation}\label{Runge_function}
     G(x) := \frac{1}{1 + x^2}
 \end{equation}
-If we try and interpolate this function using a uniform grid we see that towards the edges the polynomial behaving badly as it starts to rapidly oscillate\footnote{All the graphs presented in this paper can be found at \url{https://github.com/MattiaBarbiere/Numerical-Method-for-ODE-s} together with other plots that were not included in the paper.}.
+If we try and interpolate this function using a uniform grid we see that towards the edges the polynomial behaving badly as it starts to rapidly oscillate.
 
 \begin{center}
     \includegraphics[width=0.75\textwidth]{Images/runge phenomenon.png}
@@ -231,7 +232,7 @@ With this solution in mind, numerical methods boil down to working over each sub
 
 \section{Numerical Methods for Solving Integrals}\label{section_integrals}
 Before directly analyzing methods for solving differential equations, we first explore some methods for numerically solving integrals. This is motivated by the fact that often differential equations and integrals are essentially the same thing.
-Take a differential equation as defined in \eqref{IVP}. Often we need to assume that $f$ is continuous on an interval $(a, b)$ containing $t_{0}$ for a solution to exist. This would also make $f$ an integrable function. Taking the integral of the ODE.
+Take a differential equation as defined in \eqref{IVP}. The assumptions in the Picard–Lindel\"{o}f Theorem needed to guarantee the existence and uniqueness of a solution are also enough for us to conclude that the function $f$ is Riemann integrable over the first variable. Taking the integral of the ODE.
 \begin{equation} \nonumber
     \int_{t_{0}}^{t}f(s,y(s))ds = \int_{t_{0}}^{t}y'(s) ds = y(t) - y(t_{0}) = y(t) - y_{0}
 \end{equation}
@@ -248,7 +249,7 @@ Given any function $f: \R \longrightarrow \R$ our objective is to compute
 \begin{equation}\label{integral}
     I(f) = \int_{a}^{b}f(x)\,dx
 \end{equation}
-In light of what we know of polynomial interpoaltion a first step would be to use the interpolation of $f$ of degree 1, from \eqref{poly_interpolation} we have
+In light of what we know of polynomial interpolation a first step would be to use the interpolation of $f$ of degree 1, from \eqref{poly_interpolation} we have
 \begin{equation}\nonumber
     p(x) = \frac{x-a}{b-a} f(b) + \frac{b-x}{b-a} f(a)
 \end{equation}
@@ -311,7 +312,7 @@ Under the assumption that the grid is uniform we can find an exact value of the 
     \end{equation}
 \end{thm}
 \begin{proof}
-    The proof is basically just summing of $E_{T}(f)$ n times(JE 2013 book).
+    The proof boils down to summing the result from Theorem \ref{thm_trap_error_1_interval} over all the subintervals. More details can be found in \cite{JE_Book}.
 \end{proof}
 From this theorem we can clearly see that the trapezoidal rule with uniform grid has an error of second order $O(h^2)$.
 
@@ -323,7 +324,7 @@ This gives us to the following important corollary.
     \end{equation}
     
     \begin{proof}
-    As $f''$ is continuous on a bounded region it must have a finite maximum. Taking the absolute value of Theorem \ref{Err_uni} and taking the limit
+    We clearly have that $\max_{x \in [a,b]}|f''(x)|$ is finite by the continuity of $f''$ over $[a,b]$. Taking the absolute value of Theorem \ref{Err_uni} and taking the limit
        \begin{equation}
             \lim_{n\to\infty} |E_T(f)| = 
             \lim_{h\to0} \frac{b-a}{12}h^2|f''(\xi)|
@@ -358,7 +359,7 @@ We can construct a corollary similar to Corollary \ref{cor_err_uni} however in t
 %---------------------------Stability of trap----------------------------------
 
 \subsubsection{Stability of the trapezoid rule}
-Other than the convergence to the correct value, another important aspect of approximations is stability. That is, if we slightly perturb the input function how does the value of our integral approximation change? We would like for the approximation to change very little and moreover, if we send the size of the perturbation to zero, the approximation should converge to the original value. This gives us a sense of \textit{stability} for integration methods. Often these methods are stable however we will see that when we do a similar analysis for numerical ODE's this is not always the case.\\
+Other than the convergence to the correct value, another important aspect of approximations is stability. That is, if we slightly perturb the input function how does the value of our integral approximation change? We would like for the approximation to change very little and moreover, if we send the size of the perturbation to zero, the approximation should converge to the original value. This gives us a sense of \textit{stability} for integration methods. Often these methods are stable however we will see that when we do a similar analysis for numerical ODEs this is not always the case.\\
 Define $g(x) := f(x) + \epsilon(x)$ with $\epsilon(x)$ the slight perturbation of $f(x)$. What can we say about $|T_n(f) - T_n(g)|$ given that $|f(x) - g(x)| = |\epsilon(x)|$? Recall from equation \eqref{def_T_n} that
 \begin{equation}\nonumber
     \begin{split}
@@ -385,7 +386,7 @@ This tells us that if the maximum perturbation is sufficiently small also $|T_n(
 I will now present a comparison of the trapezoid method applied to two similar function one of which will be differentiable everywhere and the other not. By plotting the error, we can compare the convergence of the trapezoid method applied to these two functions. When I say convergence. here I mean that the error between the approximated value and the correct value goes to 0.
 \begin{ex}\label{diff_vs_non_diff}
     Consider the following two functions
-    \begin{equation}
+    \begin{equation}\nonumber
         f(x) = \arccos\left(\cos\left(e^{x}\right)\right) \tx{and} g(x) = \frac{\pi}{2}\cos\left(e^{x}+\pi\right)+\frac{\pi}{2}
         \tx{for} x \in [ln(2\pi), ln(20\pi)]
     \end{equation}
@@ -648,7 +649,7 @@ When solving this differential equation we would find a whole family of function
 As the name suggests this tell us a known value $y_{0}$ that our function $y(t)$ takes at some initial time which we denote $t_{0}$. Often for examples we will take $t_{0} = 0$ for simplicity. A complete \textit{initial value problem} is as follows.
 
 \begin{df}[Initial Value Problem]\label{IVP}
-Assume that $\Omega \subseteq \R^{2}$ is an open set and let $f:\Omega \longrightarrow \R$ be a known function. Define our unknown function $y:[a,b] \longrightarrow \R$ such that $(t,y(t)) \in \Omega$ for all $t \in [a,b]$. An Initial Value Problem is the following:
+Assume that $\, \Omega \subseteq \R^{2}$ is an open set and let $f:\Omega \longrightarrow \R$ be a known function. Define our unknown function $y:[a,b] \longrightarrow \R$ such that $(t,y(t)) \in \Omega$ for all $t \in [a,b]$. An Initial Value Problem is the following:
 \begin{equation}\nonumber
     \begin{cases}
         y'(t) = f(t,y(t))\\
@@ -657,7 +658,7 @@ Assume that $\Omega \subseteq \R^{2}$ is an open set and let $f:\Omega \longrigh
 \end{equation}
 for some known $t_{0}\in (a,b), y_{0} \in \R$, and $(t_0,y_0) \in \Omega$.
 \end{df}
-
+The Picard–Lindel\"{o}f Theorem guarantees the existence and uniqueness of a solution $y$ to an IVP under the assumptions that $f$ is continuous in $t$ and Lipschitz continuous in $y$. For more details see Theorem \ref{picard_thm} and \cite{teschlordinary}. I will be implicitly assuming these assumptions for the rest of the paper.\\
 An interesting example of initial value problem is the following. Its importance will be understood once we present the notion of absolute stability in Section \ref{Abs stability}. 
 \begin{ex}\label{ex_1}
 Consider the following IVP:
@@ -667,7 +668,7 @@ Consider the following IVP:
         y(0) = 3 
     \end{cases}
 \end{equation}
-We can easily see that the exact solution is $y(t) = 3e^{-2t}$.
+We can easily see that the exact solution is $y(t) = 3 e ^{-2t}$.
 \end{ex}
 
 
@@ -800,7 +801,8 @@ When we apply Example \ref{ex_1} to RK4 we are left with the following plot
 
 
 \section{Stability Analysis of Linear Multistep methods}
-Most of the methods we have seen thus far are all examples of linear multistep methods with the only exception being the Runge-Kutta method. This is an important distinction to make as it affects how we perform the stability analysis. For this reason I dedicate this chapter to the stability analysis of linear multistep methods and then we will focus on Runge-Kutta method separately in Section \ref{RK4_stab_sec}.\\
+Most of the methods we have seen thus far are all examples of linear multistep methods with the only exception being the Runge-Kutta method. This is an important distinction to make as it affects how we perform the stability analysis. I this section I will focus on linear multistep methods, therefore all the definition will be tailored to these kinds of methods. Nevertheless, all the derivations and explanations behind the definitions are presented in such a way that they can easily be adapted to other types of methods. We will see this in actions when we analyze the Runge-Kutta method in Section \ref{RK4_stab_sec}.
+
 {\color{white}-}\\
 A general \textit{r-step linear multistep method} is a method of the form
 \begin{equation}\label{LMM}
@@ -827,7 +829,7 @@ This notion is important as it leads to the definition of \textit{convergence} f
 \begin{df}[Convergence of numerical methods]
     We say a numerical method is convergent if, for every initial value problem \eqref{IVP},
     \begin{equation}
-        e_n = y(t_n) - y_n \to 0 \tx{as} h \to 0 \tx{for all} t_n \in [t_0, T]
+        e_n = y(t_n) - y_n \to 0 \tx{as} h \to 0 \tx{for all} t_n \in [a, b]
     \end{equation}
 \end{df}
 Next the \textit{local truncation error} for linear multistep methods is defined\footnote{The definition of truncation error may vary between reference texts, we use this definition to remain consistent with the truncation error seen in the previous sections.} as the following
@@ -854,7 +856,8 @@ Substituting this back into the local truncation error gives
 \begin{equation}\nonumber
     \sum_{j=0}^r\alpha_j=0 \tx{and} \sum_{j=0}^rj\alpha_j=\sum_{j=0}^r\beta_j
 \end{equation}
-An important observation is that these conditions only depend on the method and not the actual IVP we are solving.
+By further expanding \eqref{trunc_approx} we can sets the coefficients of higher powers of $h$ to 0, and in so doing we will be left with equations which we can use to solve for the coefficients $\alpha_i$ and $\beta_i$ for $i\in\{0,...,r\}$. As a consequence the local truncation error will be of higher order and by Theorem \ref{convergence_with_zero_stability} also the global error will be of higher order. This approach was used to derive higher other Adams-Bashforth methods for example.\\
+An important observation is that these conditions only depend on the method and not the actual IVP we are solving hence hold true for any initial value problem we may tackle.  
 
 %---------------------------Char polynomial--------------------------------
 
@@ -874,11 +877,9 @@ With these definitions in mind we can rewrite the the consistency conditions as
 
 The next step is introducing the notion of \textit{zero-stability}. This is one of many different notions of stability for numerical methods one can look at. It is very simple but nonetheless very impactful thanks to Theorem \ref{convergence_with_zero_stability}.
 
-To get some intuition of what zero-stability means, let's look at the simplest example of ODE: 
-\begin{ex}\label{zero_stab_example}
-    \begin{equation}
-        y'(t) = 0 \tx{with} y(0)=0 \nonumber
-    \end{equation}
+To get some intuition of what zero-stability means, let's look at the simplest example. 
+\begin{ex}\label{zero_stab_example} Consider this IVP:\quad
+    $y'(t) = 0 \tx{with} y(0)=0$
 \end{ex}
 An obvious solution of this is $y(t) = 0$, but there are many methods that fail to reach this solution given a small initialization error. The next examples illustrates this very well.
 
@@ -912,7 +913,7 @@ which is exactly like saying that $k$ must be a root of $\rho(x)$. What's more, 
     y_n = \sum_{j=1}^rc_jx_j^{n}
 \end{equation}
 where $x_j$ for $j = 1,...,r$ are the roots of $\rho(x)$. To solve for the coefficients we must use the initial conditions. To start the recurrence we need $r$ initial conditions so we have enough starting information to solve for the $r$ coefficients which leaves us with a $r \times r$ system of equations.
-A first idea of stability could be imposing that $y_n$ should not diverge as $n \to \infty$. For this be to fulfilled we must have that $|x_j| \leq 1$ for all the roots. There is a slight catch if the roots repeat as the system to solve for the initial conditions becomes singular and so we must impose that $|x_j| < 1$ if $x_j$ is a repeated root to mend this. 
+A first idea of stability could be imposing that $y_n$ should not diverge as $n \to \infty$. For this be to fulfilled we must have that $|x_j| \leq 1$ for all the roots. There is a slight catch if the roots repeat as the system to solve for the initial conditions becomes singular and so we must impose that $|x_j| < 1$ if $x_j$ is a repeated root to mend this. A more precise explanation of this may be found at \cite{leveque2007finite}.
 
 All of this reasoning is the motivation for defining zero-stability.
 \begin{df}[zero-stability for linear multistep methods]
@@ -924,14 +925,18 @@ All of this reasoning is the motivation for defining zero-stability.
 \end{df}
 The discussion above conveys the intuition behind zero-stability: we say that a numerical method is zero-stable if, given an slight perturbation of the initial condition of Example \ref{zero_stab_example}, $y_n$ does not diverge as $n \to \infty$ (equivalently $h \to 0$).
 This important definition as it leads to the following theorem.
-\begin{thm}\label{convergence_with_zero_stability}
-    Given a linear multistep method used to solve an initial value problem as in Definition \ref{IVP} we have that:
+\begin{thm}[Dahlquist’s Equivalence Theorem]\label{convergence_with_zero_stability}
+    Given a linear multistep method used to solve an initial value problem as in Definition \ref{IVP}, under the assumptions of the Picard–Lindel\"{o}f Theorem \eqref{picard_thm} we have that:
     \begin{equation}\nonumber
         \text{consistency} \quad + \quad\text{zero stability} \quad \iff \quad\text{convergence}
     \end{equation}
 
-Moreover if the solution $y \in C^{\,p+1}([a,b])$ and truncation error of order $O(h^{p+1})$ then the global error if of order $O(h^p)$.
+Moreover if the solution $y \in C^{\,p+1}([a,b])$ and local truncation error is of order $O(h^{p+1})$ then the global error if of order $O(h^p)$.
 \end{thm}
+
+\begin{proof}
+    The proof of this theorem can be found in \cite{gautschi2011numerical}
+\end{proof}
 % \begin{proof}
 % %see suli and mayers book
 %     The proof of this result is long and technical; for details of the argument, see Theorem 6.3.4 on page 357 of W. Gautschi, Numerical Analysis: an Introduction, Birkh¨auser, Boston, MA, 1997, or Theorem 5.10
@@ -985,7 +990,7 @@ Similarly to the trapezoidal method, also Adams-Bashforth is consistent. Further
 \end{equation}
 Since $\rho_{AB}(x)$ has two roots $x_1 = 0$ and $x_2 = 1$ we conclude that also this method is convergent.\\
 {\color{white}-}\\
-Zero-stability however is not the only kind of stability we care about. In fact often this stability is not useful (example of this ????). These condition basically tell us that "eventually" for $h$ small enough we will reach the exact answer. Say, however, we are looking for an arbitrary precision to the real solution. How small does $h $ have to be to ensure that precision? Actually, it can also happen that for values of $h$ not small enough the error is extremely large. Essentially there are no guarantees that a given $h$ will give a small error. To dive deeper into stability analysis we will introduce absolute stability.
+Zero-stability however is not the only kind of stability we care about. In fact often this stability is not useful. These condition basically tell us that "eventually" for $h$ small enough we will reach the exact answer. Say, however, we are looking for an arbitrary precision to the real solution. How small does $h $ have to be to ensure that precision? Actually, it can also happen that for values of $h$ not small enough the error is extremely large. Essentially there are no guarantees that a given $h$ will give a small error. To dive deeper into stability analysis we will introduce absolute stability.
 
 %---------------------------Abs stability-------------------------------
 
@@ -994,21 +999,21 @@ This notion of stability focuses on a specific linear example of ODE. We will ca
 \begin{equation} \label{test_ODE}
     y'(t) = \lambda y(t) 
 \end{equation}
-While this equation seems extremely simple, by varying $\lambda$ we can really put to the test many of the methods we have seen. If we take one step further we can even take $\lambda$ to be complex allowing us to visualize regions of absolute stability in the complex plane. Why do we care so much about equation \eqref{test_ODE} who has a very simple solution $Ce^{\lambda t}$? Well the reason for this is that this is the simplest example of whats called a stiff differential equation. A stiff differential equation causes many numerical method to behave unstably if $h$ is not chosen small enough. If, for example, we take $\lambda$ to be very large, then the step the numerical method makes is multiplied by $\lambda$ and might lead to the numerical method overshooting the real value. This is clearly seen in  Example \ref{ex_1} applied to AB2 when $h = 0.5$. So the numerical method will have a hard time converging to the correct result. We notice that this can be mitigated by choosing $h$ small enough so to counteract the impact $\lambda$ has on the method.
+While this equation seems extremely simple, by varying $\lambda$ we can really put to the test many of the methods we have seen. If we take one step further we can even take $\lambda$ to be complex allowing us to visualize regions of absolute stability in the complex plane. Why do we care so much about equation \eqref{test_ODE} who has a very simple solution $Ce^{\lambda t}$? Firstly, it can be generalized to include linear system of differential equations. In this case all we have to do is calculate the eigenvalues of the matrix representing the system and we can apply absolute stability to each eigenvalue in order to conclude absolute stability over the whole system. Actually it can be even generalized to non-linear systems, by taking a linear approximation of the function and applying the same idea as for linear system of differential equations. The second reason for its importance is that this is the simplest example of whats called a stiff differential equation. A stiff differential equation causes many numerical method to behave unstably if $h$ is not chosen small enough. If, for example, we take $\lambda$ to be very large, then the step the numerical method makes is multiplied by $\lambda$ and might lead to the numerical method overshooting the real value. This is clearly seen in  Example \ref{ex_1} applied to AB2 when $h = 0.5$. So the numerical method will have a hard time converging to the correct result. We notice that this can be mitigated by choosing $h$ small enough so to counteract the impact $\lambda$ has on the method.
 For example applying the explicit Euler method to \eqref{test_ODE} gives
 \begin{equation}\label{euler_abs_stab}
     y_{n+1} = (1+h\lambda)y_n
 \end{equation}
 For the explicit Euler method to be absolutely stable we must have that $|1+h\lambda|\leq 1$. Note that while $\lambda$ is complex we still take $h$ to be real. It is evident that the important aspect here is the product of $h$ and $\lambda$. This is perfectly inline with what we discussed above since taking $h$ small can reduce the effect of $\lambda$. So the important aspect to monitor is the product $\lambda h$ and it is precisely this that we are going to plot to find what is called the stability regions of the numerical methods.\\
-In the explicit Euler case we get a circle with radius 1 and center $(-1,0)$.\\
-The reason why this definition is so powerful is that it can be generalized to include linear system of differential equations. In this case all we have to do is calculate the eigenvalues of the matrix representing the system and we can apply absolute stability to each eigenvalue in order to conclude absolute stability over the whole system. Actually it can be even generalized to non-linear systems, by taking a linear approximation of the function and applying the same idea as for linear system of differential equations.
+In the explicit Euler the stability region comes out to be a circle of radius 1 centered at $(-1,0)$ as we can see in Section \ref{particular case euler section}.
+
 
 %---------------------------Abs stability for LMM-------------------------------
 
 \subsubsection{Absolute stability for general multistep methods}
 Using \eqref{LMM} to solve our test problem and rearranging we obtain
 \begin{equation}\label{difference_equation_abs_stab}
-    \sum_{j=0}^r(\alpha_j -  h \lambda\beta_j) y_{n+j} = 0
+    \sum_{j=0}^r(\alpha_j -  h \lambda\beta_j)\, y_{n+j} = 0
 \end{equation}
 Similar to the previous example, the important parameter to consider is the product of $h$ and $\lambda$. Setting $z=h\lambda$ we define the stability polynomial defined as
 \begin{equation}\nonumber
@@ -1027,7 +1032,7 @@ We are now ready to plot some stability regions of some numerical methods.
 
 %---------------------------euler method case-------------------------------
 
-\subsection{Particular case: Euler methods}
+\subsection{Particular case: Euler methods}\label{particular case euler section}
 We have already seen the derivation for the stability region of the explicit Euler method. Deriving the implicit Euler method stability region is very similar.\\
 \begin{minipage}[b]{.5\textwidth}
     \includegraphics[width=\textwidth]{Images/Stab region of Explicit Euler.png}
@@ -1037,9 +1042,9 @@ We have already seen the derivation for the stability region of the explicit Eul
 \end{minipage}%
 
 \subsubsection{Discussion of the Euler methods}
-Euler methods come out naturally from approximating the derivative using the difference quotient which implies that they are as simple as one can get. Their simplicity means that it takes very little computational power to run as we are only calling the function once (which might become be expensive for complicated functions) and performing basic operations. This simplicity however comes at a cost of instability. Just by looking at the stability region of the explicit Euler method. This means that $h$ must be chosen very well to avoid instability and often $h$ might have to be so small that the number of computations needed become to large. Often computers have trouble dealing with very small numbers as this will likely lead to floating point number approximations.\\
+Euler methods come out naturally from approximating the derivative using the difference quotient which implies that they are as simple as one can get. Their simplicity means that it takes very little computational power to run as we are only calling the function once (which might become be expensive for complicated functions) and performing basic operations. This simplicity however comes at a cost of instability. Just by looking at the stability region of the explicit Euler method. This means that $h$ must be chosen very well to avoid instability and often $h$ might have to be so small that the number of computations needed become to large. Often computers have trouble dealing with very small numbers as this will likely lead to floating point number approximations.
 {\color{white}-}\\
-Backwards Euler on the other hand does not suffer from a small stability region, however slow convergence and the high chance of low accuracy remain very prominent issues. Furthermore, it is a implicit method which comes with some serious drawback as we shall see in the discussion of the trapezoidal method, Section \ref{discussion_trap}.\\
+Backwards Euler on the other hand does not suffer from a small stability region, however slow convergence and the high chance of low accuracy remain very prominent issues. Furthermore, it is a implicit method which comes with some serious drawback as we shall see in the discussion of the trapezoidal method, Section \ref{discussion_trap}.
 
 %---------------------------trap case stab-------------------------------
 \subsection{Particular case: Trapezoidal method for IVPs}
@@ -1080,7 +1085,7 @@ In this case checking the root condition may become complicated, and more so for
 \end{minipage}%
 
 \subsubsection{Discussion of the Adams-Bathforth method}
-After having slightly varied the derivation of the trapezoidal method we discovered another method: Adams-Bashforth (which actually belongs to a whole family of methods). This method is particularly interesting as it only uses one extra function call to gain compared to the explicit Euler method (TODO: double check). This method also suffers from the drawbacks of implicit method and even if we try higher order AB methods we see that the stability region becomes extremely small leading to a very high chance of instability.
+After having slightly varied the derivation of the trapezoidal method we discovered another method: Adams-Bashforth (which actually belongs to a whole family of methods). This method is particularly interesting as it only uses one extra function call to gain compared to the explicit Euler method (TODO: double check). TODO.... even if we try higher order AB methods we see that the stability region becomes extremely small leading to a very high chance of instability.
 
 
 %-----------------Stab analyis of RK4----------------------
@@ -1096,14 +1101,14 @@ By direct computation we get the following values for $k_1$, $k_2$, $k_3$, and $
     k_1 &= \lambda y_n\\ \nonumber
     k_2 &= y_n \left(\lambda + \frac{\lambda^2 h}{2} \right)\\ \nonumber
     k_3 &= y_n \left(\lambda + \frac{\lambda^2 h}{2} + \frac{\lambda^3 h^2}{4} \right)\\ \nonumber
-    k_4 &= y_n \left(\lambda + \lambda^2 h + \frac{\lambda^3 h^2}{2} + \frac{\lambda^4 h^3}{4} \right)\\ \nonumber
+    k_4 &= y_n \left(\lambda + \lambda^2 h + \frac{\lambda^3 h^2}{2} + \frac{\lambda^4 h^3}{4} \right) \nonumber
 \end{align}
 Putting everything together we get the value of $y_{n+1}$.
 \begin{equation}\nonumber
     y_{n+1} = y_n \left[1 + \lambda h + \frac{(\lambda h)^2}{2} + \frac{(\lambda h)^3}{6} + \frac{(\lambda h)^4}{24} \right]
 \end{equation}
-The spectacular part about this is that the multiplicative coefficient of $y_n$ is exactly the fourth order taylor expansion of $e^{\lambda h}$ which, up to multiplicative constant, is the correct solution to \eqref{test_ODE_abs_stab}. \\
-Using $z = \lambda h $ as above let us define
+The spectacular part about this is that the multiplicative coefficient of $y_n$ is exactly the fourth order Taylor expansion of $e^{\lambda h}$ which, up to multiplicative constant, is the correct solution to \eqref{test_ODE_abs_stab}. \\
+Using $z = \lambda h $ as above, let us define
 \begin{equation}\nonumber
     R(z) := 1 + z + \frac{z^2}{2!} + \frac{z^3}{3!} + \frac{z^4}{4!}
 \end{equation}
@@ -1117,13 +1122,13 @@ Similarly to how to analysed the absolute stability of the explicit Euler method
 \end{minipage}%
 
 \subsection{Discussion of Runge-Kutta of fourth order}
-The RK4 method is a very good compromise between complexity and stability is the fourth order Runge-Kutta method. We can see that this method performs remarkably well in many examples and has a very large stability region. Moreover, we notice that in fact the stability regions gets bigger as we increase the order of the method (see github). By not being a multistep method there is not need to estimate the first few points which means it is "self-starting". Ultimately what makes it powerful is the fact that it takes the weighted average of various slopes before taking the step. This makes it more robust and helps to lower any errors that may come up from calculating a single slope. All of this obviously comes at a cost. Usually RK4 takes more computational time than multistep method of comparable accuracy and this becomes more evident when we try to solve systems of ODE's. Lastly, the error estimation of the RK methods is quite messy and hard to analysis.
+The RK4 method is a very good compromise between complexity and stability is the fourth order Runge-Kutta method. We can see that this method performs remarkably well in many examples and has a very large stability region. Moreover, we notice that in fact the stability regions gets bigger as we increase the order of the method as we can see in the picture above. By not being a multistep method there is not need to estimate the first few points which means it is "self-starting". Ultimately what makes it powerful is the fact that it takes the weighted average of various slopes before taking the step. This makes it more robust and helps to lower any errors that may come up from calculating a single slope. All of this obviously comes at a cost. Usually RK4 takes more computational time than multistep method of comparable accuracy and this becomes more evident when we try to solve systems of ODEs. Lastly, the error estimation of the RK methods is quite messy and hard to analysis.
 
 \section{Concluding Remarks}
-Throughout this paper I have presented some of the simplest and most common numerical methods for solving ODE's each with its advantages and disadvantages. The reason why there are so many methods is that no method is perfect and ultimately choosing the best method may depend on the problem at hand.
+Throughout this paper I have presented some of the simplest and most common numerical methods for solving ODEs each with its advantages and disadvantages. The reason why there are so many methods is that no method is perfect and ultimately choosing the best method may depend on the problem at hand.
 {\color{white}-}\\
 After having done of all this analysis a natural question comes up: why don't we use method of higher order? This seems like a very reasonable question, in fact the stability region of the Runge-Kutta method seems to keep getting bigger, so why don't we just keep increasing the order?
-Well the first problem is that it is even very complicated just to come with the methods! Take the Runge-Kutta family for example, even though I did not present the derivation, the formula comes from solving a system of equations. To derive higher order methods the number of equations in the system essentially blows up. For example firth order RK would require sixteen equations. Ketcheson notes this can only be done efficiently up to order eight [Ketcheson and BinWaheed, 2014, p. 178].
+Well the first problem is that it is even very complicated just to come with the methods! Take the Runge-Kutta family for example, even though I did not present the derivation, the formula comes from solving a system of equations. To derive higher order methods the number of equations in the system essentially blows up. For example firth order RK would require sixteen equations. Actually in \cite{Ketcheson_2014} the authors point out that this can only be done efficiently up to order eight. %[Ketcheson and BinWaheed, 2014, p. 178]
 Even if it were possible to find any other higher order numerical method they usually become very complicated and harder to implement, which in turn brings with it more computation and so longer run times, not to mention the extremely complicated error analysis that would come with these methods. All of this effort would only bring a slight improvement to the best numerical methods we have so far. In most application often the accuracy of the methods we already have is sufficiently high and increasing the order of methods does not necessarily mean that they would be more stable. Take for example the Adams-Bashforth methods. So in summary, the effort of discovering and implementing higher order methods makes using higher order methods hard to justify.
 
 
@@ -1209,10 +1214,9 @@ Even if it were possible to find any other higher order numerical method they us
 
 \appendix
 
-\section{Appendix: Generalized Integral Mean Value Theorem}
+\section{Appendix: Supplementary Theorems}
 
 %---------------------------Useful theorems----------------------------------
-
 \begin{thm}[Generalized Integral Mean Value Theorem]\label{Gen_IMVT}
     Suppose $f,g:\R \longrightarrow \R$ with $f,g \in C([a,b])$. Furthermore, assume $g$ does not change sign on $[a,b]$. Then there exists a points $\xi \in [a,b]$ such that
     \begin{equation}\nonumber
@@ -1220,8 +1224,16 @@ Even if it were possible to find any other higher order numerical method they us
     \end{equation}
 \end{thm}
 \begin{proof}
-    The proof can be found in \cite{JE_Book} pp. 10
+    The proof can be found in \cite{JE_Book}.
 \end{proof}
+
+\begin{thm}[Picard–Lindel\"{o}f]\label{picard_thm}
+    Let  $f:\Omega \longrightarrow \R^n$ and suppose $ f \in C(\Omega)$ where $\, \Omega$ is an open subset of $\R^{n+1}$, and $(t_0, y_0) \in \Omega$. If f is locally Lipschitz continuous in the second argument and uniformly continuous with respect to the first, then there exists a unique local solution $y(t) \in C(I)$ of the IVP \eqref{IVP}, where $I$ is some interval around $t_0$.
+\end{thm}
+\begin{proof}
+    The proof can be found in \cite{teschlordinary}.
+\end{proof}
+
 
 
 
