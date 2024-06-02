@@ -72,10 +72,17 @@
 \newtheorem{lemma}[thm]{Lemma}
 \newtheorem{prop}[thm]{Proposition}
 
-\null\thispagestyle{empty}\newpage
-\null\thispagestyle{empty}\newpage
-\textbf{Dedication or acknowledgements (if not included, a blank page)}\thispagestyle{empty}\newpage
-\null\thispagestyle{empty}\newpage
+% \null\thispagestyle{empty}\newpage
+% \null\thispagestyle{empty}\newpage
+% \textbf{Dedication or acknowledgements (if not included, a blank page)}\thispagestyle{empty}\newpage
+% \null\thispagestyle{empty}\newpage
+
+\textbf{Abstract}-----------------------------------------------------------------------\\
+% Integrals and differential equations are a vital tool used throughout mathematics. In particular, they are essential in many modelling real world problems throughout scientific disciplines. When we try to apply these tools in practice, however we encounter some difficulties, as it is often the case that no analytical solutions can be computed. This problem . This branch of mathematics also brings an added benefit of providing easy implementation of numerical methods on modern computers, allowing the computation and simulations of ever more complicated mathematical models.\\
+Integrals and differential equations are a vital tool used to model our world with applications in every scientific discipline. Nowadays, ever more complicated models and the lack of analytical solutions gave rise to \textit{numerical analysis}. This branch of mathematics provides numerical methods to approximate the correct value without needing an explicit solution to the problem. As an added benefit these numerical methods are easily translated into computer code, allowing us to apply modern computational power to compute and simulate our mathematical models. 
+With this motivation in mind, I will present an introductory dive into some important aspect of numerical analysis, with a particular emphasis on analysing methods to compute integrals and solve differential equations. Often these two concepts go hand in hand, which leads to many similarities between numerical methods. The integration methods are simpler but nonetheless important. My focus with these methods will mainly be on the error analysis which provides insight to why these methods may differ from the correct result.  In contrast, when discussing the methods for solving ordinary differential equations there will be particular emphasis on the stability analysis. This is due to the fact that methods for solving ODEs may have very different behaviour depending on the problem at hand. With the theoretical results stated in this paper it is, at least in principle, to tune parameters of numerical methods to guarantee  stability and hence a better accuracy of the final result.
+
+-----------------------------------------------------------------------------------
 
 %Resetting the page numbering
 \clearpage
@@ -88,9 +95,10 @@
 %---------------------------Introduction----------------------------------
 
 \section{Introduction}
-Integrals and differential equations are a vital tool used throughout mathematics. In particular, they are essential in many modelling real world problems throughout scientific disciplines. When we try to apply these tools in practice, however we encounter some difficulties, as it is often the case that no analytical solutions can be computed. This problem gave rise to \textit{numerical analysis} which tries to approximate the correct value without needing an explicit solution to the problem. After having developed all the theoretical concepts, we can easily translate this into computer code. For this reason, this paper goes hand in hand with a Jupyter Notebook available at \cite{Barbiere_Numerical_Method_for}. This notebook contains the implementations of all the numerical methods I cover, together with graphical illustrations, some of which are already included in this paper.
-
-With this motivation in mind, I will now present an introductory dive into some important aspect of numerical analysis, with a particular emphasis on analysing methods to solve integrals and differential equations. In Section \ref{section_integrals} we will see that these two concepts often go hand in hand, which leads to many similarities between numerical methods. Before starting with the methods I will devote some time to polynomial interpolation which is at the heart of many derivations in numerical analysis.
+The need for numerical methods for computing integrals and solving differential equations has been around for many years. Over time better methods and stronger theorems have been developed bring us to where we are today where numerical analysis is now a vast and complex branch of mathematics.\\
+% To being understanding the concepts of Numerical Analysis I will present some important numerical method for integration and solving ordinary differential equations, and it will become evident that these methods often go hand in hand which gives some similarities in their derivations.\\
+With the advent of modern computers the most fundamental application of numerical analysis has been in computer science. For this reason, this paper is pared up with a Jupyter Notebook available at \cite{Barbiere_Numerical_methods_for} where I implement all the numerical methods covered, together with graphical illustrations, some of which are already presented below.\\
+Before starting with the methods I will devote some time to polynomial interpolation which is at the heart of many derivations in numerical analysis.
 
 %---------------------------Polynomial Interpolation------------------------------
 
@@ -98,10 +106,10 @@ With this motivation in mind, I will now present an introductory dive into some 
 %https://services.math.duke.edu/~jtwong/math563-2020/lectures/Lec1-polyinterp.pdf
 %For proof of lagrange theorem:
 %https://math.okstate.edu/people/binegar/4513-F98/4513-l16.pdf
-Throughout numerical analysis we encounter problems that have to deal with very intricate and complicated functions which often cause trouble when we try applying our mathematical tools on them. To try and overcome these issues, we must find clever ways to approximate the complicated functions with simpler and more mathematically tractable ones. Polynomials seems to check all the boxes in this case. They are very easy to manipulate and to perform operations on. Furthermore, they are extremely versatile as you can increase their degree and play around with their coefficients to approximate essentially any function. Actually, the Weierstrass Approximation Theorem \ref{W_approx_thm} states that any continuous function on a closed interval $[a,b]$ can be approximated to an arbitrary level of precision by a polynomial.
-This theorem, however, does not tell us how to find such a polynomial. A classic why of finding a possible polynomial is using a Taylor expansion. While this is very powerful in itself, in this chapter we will explore another why of finding a polynomial approximation of a function: \textit{Lagrange polynomial interpolation}.\\
+Throughout numerical analysis we encounter problems that have to deal with very intricate and complicated functions which often cause trouble when we try applying our mathematical tools on them. To try and overcome these issues, we must find clever ways to approximate the complicated functions with simpler and more mathematically tractable ones. Polynomials seems to check all the boxes in this case. They are very easy to manipulate and are well behaved when we apply operations on them. Furthermore, they are extremely versatile since you can essentially approximate any function by choosing the correct degree and playing around with their coefficients. Actually, the Weierstrass Approximation Theorem (see Theorem \ref{W_approx_thm}) states that any continuous function on a closed interval $[a,b]$ can be approximated to an arbitrary level of precision by a polynomial.
+This theorem, however, does not tell us how to find such a polynomial. A classic why of finding a possible polynomial is using a Taylor expansion. While this is very powerful, in this chapter we will explore another why of finding a polynomial approximation of a function: \textit{Lagrange polynomial interpolation}.\\
 {\color{white}-}\\
-Given a function $f$ and $n+1$ points $\{x_0, \dots , x_n\}$ (data points for example) define
+Given a function $f$ and $n+1$ points $\{x_0, \dots , x_n\}$ (sampling points for example) define
 \begin{equation}\nonumber
     y_i := f(x_i) \tx{for} i \in \{0,\dots,n\}
 \end{equation}
@@ -109,8 +117,7 @@ We say a function $p(x)$ is an \textit{interpolant} for $f(x)$ if $p(x)$ matches
 \begin{equation}\label{poly_interpolation_conditions}
     p(x_i) = y_i \tx{for} i \in \{0,\dots,n\}
 \end{equation}
-We will focus on interpolations with polynomials throughout this paper, but this idea can be generalized to other classes of functions. On a side note, I often use interpolation and approximation interchangeably, however they are not the same thing. Interpolation is a method that may or may not be a useful approximation. All we say is that it must match the function at a finite amount of points. A priori, there is no reason to believe that this may work as a good approximation. Luckily, in numerical analysis interpolation works very well! Its main usefulness is when we have a finite number of data points and finite values of a function. In this case, methods like Taylor series will fail as we have no real knowledge about derivatives. When we have complete knowledge about the function it may be a lot better to use a Taylor's approximation compared to a polynomial interpolation.\\
-{\color{white}-}\\
+We will focus on interpolations with polynomials throughout this paper, but this idea can be generalized to other classes of functions. On a side note, I often use interpolation and approximation interchangeably, however they are not the same thing. Interpolation is a method that may or may not be a useful approximation. All we say is that it must match the function at a finite amount of points. A priori, there is no reason to believe that this may work as a good approximation. Luckily, in numerical analysis, with a small modification presented in section \ref{runge_pheno_section}, interpolation works very well! Its main usefulness is when we have a finite number of data points and finite values of a function. In this case, methods like Taylor series will fail as we have no knowledge about derivatives.\\
 Our objective is to construct a polynomial that satisfies \eqref{poly_interpolation_conditions}. The construction of $p(x)$ with the Lagrange method comes down to understanding the Lagrange basis.
 \begin{equation}\nonumber
     l_i(x)=\prod_{j: j \neq i} \frac{x-x_j}{x_i-x_j}
@@ -146,9 +153,9 @@ This polynomial turns out to be unique among all the polynomials of degree $n$.
 %---------------------------Error analysis of interpolation---------------------
 
 \subsection{Error analysis of Lagrange polynomial interpolation}
-Many of the numerical method I will cover start from a polynomial interpolation of the function in question. To provide a detailed error analysis of the methods to come, we must first understand the error that comes from polynomial interpolation. To this end we have the following theorem.
+Many of the numerical method I will cover start from a polynomial interpolation of the function in question. To provide a detailed error analysis of such methods, we must first understand the error that comes from polynomial interpolation. To this end we have the following theorem.
 \begin{thm}[Lagrange error formula]\label{Err_interpolation_thm}
-    Assume $f \in C^{\,n+1}([a,b])$ with $n+1$ points
+    Assume $f \in C^{\,n+1}([a,b])$ and $n+1$ points
     \begin{equation}\nonumber
         x_0<x_1<x_2<\dots<x_{n-1}<x_n \quad \text{with} \quad x_i \in [a,b]\quad \forall i \in \{0,\dots,n\} \nonumber
     \end{equation}
@@ -166,7 +173,7 @@ Many of the numerical method I will cover start from a polynomial interpolation 
     A proof of this theorem can be found in \cite{gautschi2011numerical}
 \end{proof}
 
-Let's take a better look at \eqref{Err_interpolation}. The first term we see is the (n+1)-th derivative. As we are working with a compact interval, we can easily bound this by taking the $\max_{x \in [a,b]} |f^{(n+1)}(x)|$. As we decrease the interval size, this value may decrease or stay the same depending on the function.\\
+Let's take a better look at \eqref{Err_interpolation}. The first term we see is the $(n+1)$-th derivative. As we are working with a compact interval, we can easily bound this by taking the $\max_{x \in [a,b]} |f^{(n+1)}(x)|$. We have little to no control of this value as it entirely depends on the function in question.\\
 The second term is $\frac{1}{(n+1)!}$ which, lucky for us, goes to 0 very quickly as $n \to +\infty$.\\
 The last term is what we call $\omega(x)$:
 \begin{equation}\nonumber
@@ -181,20 +188,22 @@ The error analysis essentially boils down to which factor will have a bigger eff
 %---------------------------Runge phenomenon----------------------------------
 
 \subsection{Convergence of Lagrangian interpolation}
-The next question that comes to mind is whether the interpolation error goes to 0 as we increase the degree of the polynomial. The answer to this depends on our choice of the interpolation points. All the methods I will present will assume that the data points are evenly spaced with size $h$. In doing so, however, we risk running into a problem of the interpolation polynomial diverging from the function. The next example illustrates an instance in which this happens.
+The idea behind the discussion above is that we can sample $n$ values of our arbitrarily complicated function and construct a polynomial approximation that coincides with the function at those points. The next question that comes to mind is whether the interpolation error goes to 0 as we increase the number of samples. The answer to this depends on our choice of the interpolation points. All the methods I will present will assume that the data points are evenly spaced with size $h$. In doing so, however, we risk running into a problem of the interpolation polynomial diverging from the function. The next example illustrates an instance in which this happens.
 
-\subsubsection{Runge's phenomenon}
+\subsubsection{Runge's phenomenon}\label{runge_pheno_section}
 Consider the interval $[-5,5]$ and the following $C^{\infty}([-5,5])$ function over that interval,
 \begin{equation}\label{Runge_function}
     G(x) := \frac{1}{1 + x^2}
 \end{equation}
 If we try and interpolate this function using a uniform grid we see that towards the edges the polynomial starts to rapidly oscillate.
 
-\begin{center}
+\begin{figure}[h]
+    \centering
     \includegraphics[width=0.75\textwidth]{Images/runge phenomenon.png}
-\end{center}
+    \caption{Divergence of interpolant polynomial with uniform grid when applied to the Runge function $G(x) = \frac{1}{1 + x^2}$}
+\end{figure}
 
-For larger values of n this behaviour only gets worse. The problem of this function is that the n-th derivatives blow up in the interval $[-5,5]$. Some empirical evidence of this is available in the Jupyter Notebook \cite{Barbiere_Numerical_Method_for}.
+For larger values of $n$ this behaviour only gets worse. The problem of this function is that the $n$-th derivatives blow up in the interval $[-5,5]$. Some empirical evidence of this is shown in the Jupyter Notebook \cite{Barbiere_Numerical_methods_for}.
 % \begin{center}
 %     \begin{tabular}{c c c}
 %     \toprule
@@ -219,21 +228,20 @@ For larger values of n this behaviour only gets worse. The problem of this funct
 %     \includegraphics[width=\textwidth]{Images/min over log scale.png}
 % \end{minipage}%
 
-It might seem that we have little hope of working with the polynomial interpolation with evenly spaced points, luckily for us there are a few workarounds that we can exploit. The main solution that most derivations will use is \textit{spline interpolation}. Essentially, what this does is to break up the interval into many subintervals. This actually has a few advantages. The first and foremost is that we avoid the bad behaviour seen above. Secondly, it allows us to work with lower degree polynomials, which reduces complexity. Lastly, by reducing the size of the subintervals, if our function is smooth enough, we can approximate very well the function with our low degree interpolating polynomial. Below we can see that spline interpolation works very well even with the problematic Runge function $G(x)$.
+It might seem that we have little hope of working with the polynomial interpolation with evenly spaced points. Lucky for us there are a few workarounds that we can exploit. The main solution that most derivations will use is \textit{spline interpolation}. What this does is to break up the interval into many subintervals. The advantages of this are twofold. The first and foremost is that we avoid the bad behaviour seen above. Secondly, by reducing the size of the subintervals, if our function is smooth enough, we can approximate very well the function with a low degree interpolating polynomial, which reduces complexity. Below we can see that spline interpolation works very well even with the problematic Runge function $G(x)$.
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=\textwidth]{Images/Spline interpolation.png}
-    \caption{Caption}
-    \label{fig:enter-label}
+    \caption{Spline interpolation applied to the Runge function $G(x) = \frac{1}{1 + x^2}$}
 \end{figure}
 
-With this solution in mind, numerical methods boil down to working over each subinterval individually and then combining all the answers.
+With this solution in mind, numerical methods boil down to working over each subinterval individually and then combining all the answers at the end.
 
 %---------------------------Integrals----------------------------------
 
 \section{Numerical Methods for Solving Integrals}\label{section_integrals}
-Before directly analysing methods for solving differential equations, we first explore some methods for numerically solving integrals. This is motivated by the fact that often differential equations and integrals are essentially the same thing.
+We start with exploring some methods for numerically solving integrals. This is motivated by the fact that often differential equations and integrals are two sides of the same coin.
 Take a differential equation as defined in \eqref{IVP}. The assumptions in the Picard–Lindel\"{o}f Theorem \ref{picard_thm} needed to guarantee the existence and uniqueness of a solution are also enough for us to conclude that the function $f$ is Riemann integrable over the first variable. Taking the integral of the ODE.
 \begin{equation} \nonumber
     \int_{t_{0}}^{t}f(s,y(s))ds = \int_{t_{0}}^{t}y'(s) ds = y(t) - y(t_{0}) = y(t) - y_{0}
@@ -242,7 +250,7 @@ Giving us the equation
 \begin{equation}\label{Integral_ODE}
     y(t) = y_{0} + \int_{t_{0}}^{t}f(s,y(s))ds
 \end{equation}
-By building methods to solve integrals, we are often able to make good progress in numerically solving differential equations. I will discuss the Trapezoidal Rule and Simpson's rule for integration, and in later sections we will see how these can be transformed into methods for solving ODEs.
+By building methods for computing integrals, we are often able to make good progress in numerically solving differential equations. I will discuss the Trapezoidal Rule and Simpson's rule for integration, and in later sections we will see how these can be transformed into methods for solving ODEs.
 
 %---------------------------Trap Rule----------------------------------
 
@@ -277,7 +285,7 @@ If is very evident that if $b-a$ is very large, this could turn out to be a very
     \end{equation}
     Where the last step comes from Theorem \ref{Err_interpolation_thm}.
 
-    As $(x-a)(x-b) \leq 0$ on $[a,b]$ we use Theorem \ref{Gen_IMVT} we get that, for some $\xi \in [a,b]$:
+    As $(x-a)(x-b) \leq 0$ on $[a,b]$ we use Theorem \ref{Gen_IMVT} and get that, for some $\xi \in [a,b]$:
     
     \begin{equation}\nonumber
     \begin{split}
@@ -288,7 +296,7 @@ If is very evident that if $b-a$ is very large, this could turn out to be a very
     \end{equation}
     As requested.
 \end{proof}
-As we expected, the error depends $b - a$. This means that if we have a large interval we may be very far away from the true value of the integral. Taking inspiration from spline interpolation, the trick is to divide the interval into many smaller intervals and then summing up the area of all the smaller trapezoids.\\
+As we expected, the error is highly dependent on $b-a$. This means that if we have a large interval we may be very far away from the true value of the integral. Taking inspiration from spline interpolation, the trick is to divide the interval into many smaller intervals and then summing up the area of all the smaller trapezoids.\\
 Take $n$ subintervals $[x_{i-1}, x_{i}]$ for $ i \in \{1,\dots,n\}$ with $x_0 = a$ and $x_n = b$. Our integral then becomes,
 \begin{equation}\nonumber
     I(f) = \sum_{i=1}^{n} \int_{x_{i-1}}^{x_{i}} f(x)\,dx
@@ -361,7 +369,7 @@ We can construct a corollary similar to Corollary \ref{cor_err_uni} however in t
 %---------------------------Stability of trap----------------------------------
 
 \subsubsection{Stability of the trapezoid rule}\label{sec_stab_trap_integration}
-Other than the convergence to the correct value, another important aspect of approximations is stability. That is, if we slightly perturb the input function how does the value of our integral approximation change? We would like for the approximation to change very little and moreover, if we send the size of the perturbation to zero, the approximation should converge to the original value. This gives us a sense of \textit{stability} for integration methods. Often these methods are stable, however we will see that when we do a similar analysis for numerical ODEs this is not always the case.\\
+Other than the convergence to the correct value, another important aspect of approximations is stability. That is, if we slightly perturb the input function how does the value of our integral approximation change? We would like for the approximation to change very little and moreover, if we send the size of the perturbation to zero, the approximation should converge to the original value. This gives us a sense of \textit{stability} for integration methods. Often these methods are stable, however we will see that when we do a similar analysis for numerical methods for ODEs this is not always the case.\\
 Define $g(x) := f(x) + \epsilon(x)$ with $\epsilon(x)$ the slight perturbation of $f(x)$. What can we say about $|T_n(f) - T_n(g)|$ given that $|f(x) - g(x)| = |\epsilon(x)|$? Recall from equation \eqref{def_T_n} that
 \begin{equation}\nonumber
     \begin{split}
@@ -381,30 +389,34 @@ Taking the absolute value and bounding it from above gives,
     |T_n(f) - T_n(g)| \leq 2\max_{x \in [a,b]}|\epsilon(x)|\sum_{i=1}^{n} \frac{1}{2}(x_{i} - x_{i-1}) = (b-a)\max_{x \in [a,b]}|\epsilon(x)|
 \end{equation}
 Where the last step comes from the fact that we have a telescoping sum and that $x_0 = a$ and $x_n = b$.\\
-This tells us that if the maximum perturbation is sufficiently small also $|T_n(f) - T_n(g)|$ will be small. Actually if we let $\max_{x \in [a,b]}|\epsilon(x)| \to 0$ we get that $|T_n(f) - T_n(g)| \to 0$ which means $T_n(f) \to T_n(g)$ proving that the trapezoid method is numerically stable.
+This tells us that if the maximum perturbation is sufficiently small also $|T_n(f) - T_n(g)|$ will be small. Actually if we let $\max_{x \in [a,b]}|\epsilon(x)| \to 0$ we get that $|T_n(f) - T_n(g)| \to 0$ proving that the trapezoid method is numerically stable.
 
 %--------------Diff vs non diff example for trap-------
 \subsubsection{Trapezoid integration of Differentiable vs Non-differentiable functions}
-I will now present a comparison of the trapezoid method applied to two similar function one of which will be differentiable everywhere and the other not. By plotting the error, we can compare the convergence of the trapezoid method applied to these two functions. When I say convergence. here I mean that the error between the approximated value and the correct value goes to 0.
+I will now present a comparison of the trapezoid method applied to two similar function one of which will be differentiable everywhere and the other not. By plotting the error, we can compare the convergence of the trapezoid method applied to these two functions. When I say convergence here I mean that the error between the approximated value and the correct value goes to 0.
 \begin{ex}\label{diff_vs_non_diff}
     Consider the following two functions
     \begin{equation}\nonumber
-        f(x) = \arccos\left(\cos\left(e^{x}\right)\right) \tx{and} g(x) = \frac{\pi}{2}\cos\left(e^{x}+\pi\right)+\frac{\pi}{2}
+        g(x) = \frac{\pi}{2}\cos\left(e^{x}+\pi\right)+\frac{\pi}{2} \tx{and} f(x) = \arccos\left(\cos\left(e^{x}\right)\right) 
         \tx{for} x \in [ln(2\pi), ln(20\pi)]
     \end{equation}
 \end{ex}
 
 By plotting them over the interval we see that they are very similar. The main difference is that $f$ is not differentiable everywhere.
 
-\begin{center}
+\begin{figure}[h]
+    \centering
     \includegraphics[width=\textwidth]{Images/diff vs non-diff.png}
-\end{center}
+    \caption{Plotting the functions $g(x) = \frac{\pi}{2}\cos\left(e^{x}+\pi\right)+\frac{\pi}{2}$ (blue) and $f(x) = \arccos\left(\cos\left(e^{x}\right)\right) $ (orange) over the interval $[\ln(2\pi), \ln(20\pi)] $}
+\end{figure}
 
-By applying the trapezoid method to both functions and plotting the error as a function of n, we get the following graph.
+By applying the trapezoid method to both functions and plotting the error as a function of $n$, we get the following graphs.
 
-\begin{center}
+\begin{figure}[h]
+    \centering
     \includegraphics[width=\textwidth]{Images/Error of trapezoid integration diff vs non diff.png}
-\end{center}
+    \caption{Error given by the trapezoid method when integrating differentiable function $g(x) = \frac{\pi}{2}\cos\left(e^{x}+\pi\right)+\frac{\pi}{2} $ vs non differentiable function $f(x) = \arccos\left(\cos\left(e^{x}\right)\right) $}
+\end{figure}
 
 We notice that the trapezoid method struggles with both functions at the beginning. This is due to the oscillatory nature of the functions which means the approximation cannot follow the functions well enough for small values of $n$. Once we get to $n \approx 25$ we see that for the differentiable function the error dramatically goes to 0, while for the non-differentiable function the method takes longer to reduce the error. Eventually, the error does decrease even for the non-differentiable function, but even at high values of $n$ we see some fluctuations.
 
@@ -432,7 +444,7 @@ Our aim is interpolating a function $f$ with a second degree polynomial in order
     q_{-1,1}(x) = f(-1)\frac{x(x-1)}{2} - f(0)(x+1)(x-1) + 
     f(1)\frac{x(x+1)}{2}\nonumber
 \end{equation}
-As we did with the trapezoid method. The idea is that the integral of $q_{-1,1}(x)$ over $[-1,1]$ should approximate the integral of $f$ over the same interval.
+The idea is that the integral of $q_{-1,1}(x)$ over $[-1,1]$ should approximate the integral of $f$ over the same interval.
 \begin{equation}
     \int_{-1}^{1}q_{-1,1}(x)\,dx  \approx \int_{-1}^{1}f(x)\,dx  \nonumber
 \end{equation}
@@ -474,7 +486,7 @@ Recalling that $F(-1) = f(a), F(0) = f(m), F(1) = f(b)$ and letting $h=\frac{b-a
 %---------------------------Composite simp rule----------------------------------
 
 \subsubsection{Composite Simpson's rule}
-Recalling the motivation behind spline interpolation, we divide the interval $[a,b]$ in many subintervals and perform what we did in Section \ref{Simp_single_interval} on each subinterval. Since we need a middle point to perform our interpolation, each subinterval must contain three of our data points.\\
+Recalling the motivation behind spline interpolation, we divide the interval $[a,b]$ in many subintervals and perform what we did in Section \ref{Simp_single_interval} on each subinterval. Since we need a middle point to perform our interpolation, each subinterval must contain three of our sample points.\\
 Given $n+1$ uniformly distributed points with $n$ even and $n \geq 2$ 
 \begin{equation}\nonumber
     a=x_0<x_1<x_2<\dots<x_{n-1}<x_n = b \tx{and} h = \frac{x_{2k}-x_{2k-2}}{2} = x_{2k}-x_{2k-1}\nonumber
@@ -492,7 +504,7 @@ By summing over all the subintervals we get the composite Simpson's rule as
 %---------------------------power of simp rule----------------------------------
     
 \subsubsection{The power of Simpson's rule}
-Recall from Section \ref{Simp_section} that Simpson's rule starts from a second degree polynomial interpolation of the function $f$. Consider the special case when $f$ is itself polynomial of at most second degree. Then by interpolating $f$ as we did in \eqref{second_deg_interpolation} we would get that $q_{a,b}$ is exactly equal to $f$. If this were not the case we could view $f$ as a polynomial interpolation of itself and we would contradict Proposition \ref{uniqueness_of_interp}. In this case, Simpson's rule exactly calculates the integral. Now this seems like a reasonable thing to happen, however what special about this rule is that the same is true for third degree polynomials! This gives rise to the following lemma.
+Recall from Section \ref{Simp_section} that Simpson's rule starts from a second degree polynomial interpolation of the function $f$. Consider the special case when $f$ is itself polynomial of at most second degree. Then by interpolating $f$ as we did in \eqref{second_deg_interpolation} we would get that $q_{a,b}$ is exactly equal to $f$. If this were not the case we could view $f$ as a polynomial interpolation of itself and we would contradict Proposition \ref{uniqueness_of_interp}. In this case, Simpson's rule exactly calculates the integral. Now this seems like a reasonable thing to happen, however what special about this rule is that the same is true for third degree polynomials!
 \begin{lemma}\label{power_of_simpson}
    Let $f(x)$ be a polynomial with $deg(f) \leq 3$. Then Simpson's rule comes out to be an equality
     \begin{equation}\nonumber
@@ -504,7 +516,7 @@ Recall from Section \ref{Simp_section} that Simpson's rule starts from a second 
     \begin{equation}\nonumber
         f(x) = Cx^3 + g(x) \tx{with} deg(g) \leq 2 \nonumber
     \end{equation}
-    Notice that both $I$ and $S_2$ are linear the error becomes
+    Notice that both $I$ and $S_2$ are linear thus
     \begin{equation}\nonumber
         I(f) - S_2(f) = C(I(x^3) - S_2(x^3)) + (I(g) - S_2(g))
     \end{equation}
@@ -539,7 +551,7 @@ After having seen Lemma \ref{power_of_simpson} this comes as no surprise, howeve
         I(f) - S_2(f) = -\frac{(b-a)^5}{2880}f^{(4)}(\xi)
     \end{equation}
 \end{thm}
-In Simpson's rule we are only given 3 points which means that we can interpolate with a second degree polynomial. As we have already discussed directly computing the error from $E_2(x)$ is of little help. We would like to go up by one degree, that is calculating the error using $E_3(x)$. We only have 3 points at our disposal and ultimately to derive Simpson's rule we only need these. To overcome this we start with 4 points and by taking a limit we end up with only 3.
+In Simpson's rule we are only given 3 points which means that we can interpolate with a second degree polynomial. As we have already discussed directly computing the error from $E_2(x)$ is of little help. We would like to go up by one degree, that is, calculating the error using $E_3(x)$. We only have 3 points at our disposal and ultimately to derive Simpson's rule we only need these. To overcome this we start with 4 points and by taking a limit we end up with only 3.
 \begin{proof}
     Let $p_3$ interpolate $f$ at the points $x_0=a, x_1=m-\epsilon, x_2=m+\epsilon,$ and $x_3=b$ with $\epsilon > 0$ a small deviation. By \eqref{Err_interpolation}, for $x \in [a,b]$
     \begin{equation}\nonumber
@@ -554,10 +566,10 @@ In Simpson's rule we are only given 3 points which means that we can interpolate
         \begin{split}
             S_2(E_3) & = \frac{b-a}{6}(E_3(a) + 4E_3(m) + E_3(b)) =\\
             & = \frac{b-a}{6}(4E_3(m)) = \\
-            & = \frac{4(b-a)}{6 * 4!}(m-x_0)(m-x_1)(m-x_2)(m-x_3)f^{(4)}(\eta_m)
+            & = \frac{4(b-a)}{6 \cdot 4!}(m-x_0)(m-x_1)(m-x_2)(m-x_3)f^{(4)}(\eta_m)
         \end{split}
     \end{equation}
-    Now by taking the limit as $\epsilon \to 0$ we get that $x_1 \to m$ and $x_2 \to m$. In turn this gives $E_3(m) \to 0$ and so also $S_2(E_3)$ goes to 0. Lastly, by assumption $f \in C^4([a,b])$ implying that
+    Now by taking the limit as $\epsilon \to 0$ we get that $x_1 \to m$ and $x_2 \to m$. In turn this gives $E_3(m) \to 0$ and so also $S_2(E_3)$ goes to 0. Lastly, $f \in C^4([a,b])$ implies that
     \begin{equation}\nonumber
         \frac{1}{4!}(x-a)(x-x_1)(x-x_2)(x-b)f^{(4)}(\eta_x)
     \end{equation}
@@ -589,16 +601,16 @@ By applying this theorem to each subinterval one can prove the following theorem
         I(f) - S_n(f) = -\frac{(b-a)h^4}{180}f^{(4)}(\xi)
     \end{equation}
 \end{thm}
-Here we clearly see that in fact Simpson's method has error order 4, $O(h^4)$. The remarkable thing about this rule is that we only increase the interpolation degree by one, compared to the trapezoid method, but the error increase by 2 orders!
+Here we clearly see that in fact Simpson's method has error order 4, $O(h^4)$. The remarkable thing about this rule is that we only increased the interpolation degree by one, compared to the trapezoid method, but the error increase by 2 orders!
 
 %---------------------------Example simp rule--------------------------------
 
-\subsubsection{Simpson's example}
+\subsubsection{Simpson's rule example}
 Does this theoretical order really hold? With the following simple example we will see that this does in fact occur. We would like to calculate the following integral:
 \begin{equation}\nonumber
     \int_{0}^{\pi}e^x\cos(x)\,dx
 \end{equation}
-Which we how has value $-(e^\pi+1)/2 \approx -12.070346316$. By implementing \eqref{Simpson's estimator} we get the following table.
+Which we know has value $-(e^\pi+1)/2 \approx -12.070346316$. By implementing \eqref{Simpson's estimator} we get the following table.
 
 \begin{center}
     \begin{tabular}{c c c c c}
@@ -630,9 +642,11 @@ It should be noted that we can easily perform a similar analysis to we did with 
 \subsubsection{Simpson's method on Differentiable vs Non-differentiable functions}
 Similarly to what we did with the trapezoid method, we can apply Simpson's method to the functions suggested in Example \ref{diff_vs_non_diff}. Plotting the errors for different values of $n$ we get the following plots.
 
-\begin{center}
+\begin{figure}[h]
+    \centering
     \includegraphics[width=\textwidth]{Images/Error of Simpson's integration diff vs non diff.png}
-\end{center}
+    \caption{Error given by Simpson's rule method when integrating differentiable function $g(x) = \frac{\pi}{2}\cos\left(e^{x}+\pi\right)+\frac{\pi}{2} $ vs non differentiable function $f(x) = \arccos\left(\cos\left(e^{x}\right)\right) $}
+\end{figure}
 
 By inspection we notice that, for the differentiable function, Simpson's method needs larger $n$ to stabilize and converge compared to the trapezoid method. Furthermore, Simpson's method has a very hard time approximating the non-differentiable function. Other than the rapid fluctuations we also see that the overall decrease in the error is very slow and still fluctuates for large values of $n$.
 
@@ -643,16 +657,16 @@ By inspection we notice that, for the differentiable function, Simpson's method 
 
 %---------------------------ODE----------------------------------
 \subsection{Ordinary Differential Equations}
-To fix some notation, I will denote $x:[a,b] \longrightarrow \R$ the unknown function which we wish to solve for in the differential equation. From now on I will be assuming that $y$ is a function of one variable, commonly denoted $t$, but many concepts can be extended to more general functions. An \textit{ordinary differential equation} is an equation of the form
+To fix some notation, I will denote $x:[a,b] \longrightarrow \R$ the unknown function which we wish to solve for in the differential equation. From now on I will be assuming that $x$ is a function of one variable, commonly denoted $t$, but many concepts can be extended to more general functions. An \textit{ordinary differential equation} is an equation of the form
 \begin{equation}\label{ODE}
-    \diff{x(t)}{t} = x'(t) = f(t,x(t))
+    \diff{x}{t}(t) = x'(t) = f(t,x(t))
 \end{equation}
-When solving this differential equation we would find a whole family of functions that satisfy \eqref{ODE}. To have a unique solution we need to pair our ODE with an initial condition.
+When solving for $x(t)$ we find a whole family of functions that satisfy \eqref{ODE}. To have a unique solution we need to pair our ODE with an initial condition.
 
 %---------------------------IVP----------------------------------
 
 \subsubsection{Initial Value Problems}
-As the name suggests, an \textit{initial value problem} combines an ODE with a known value $x_{0}$ that our function $x(t)$ takes at some initial time which I denote $t_{0}$. Often in examples I will take $t_{0} = 0$ for simplicity.
+As the name suggests, an \textit{initial value problem} combines an ODE with a known value $x_{0}$ that our function $x(t)$ takes at some initial time denoted $t_{0}$. Often in examples I will take $t_{0} = 0$ for simplicity.
 
 \begin{df}[Initial Value Problem]\label{IVP}
 Assume that $\, \Omega \subseteq \R^{2}$ is an open set and let $f:\Omega \longrightarrow \R$ be a known function. Define a function $x:[a,b] \longrightarrow \R$ such that $(t,x(t)) \in \Omega$ for all $t \in [a,b]$. An Initial Value Problem is the following:
@@ -664,7 +678,7 @@ Assume that $\, \Omega \subseteq \R^{2}$ is an open set and let $f:\Omega \longr
 \end{equation}
 for some known $t_{0}\in (a,b), x_{0} \in \R$, and $(t_0,x_0) \in \Omega$.
 \end{df}
-The Picard–Lindel\"{o}f Theorem guarantees the existence and uniqueness of a solution $x$ to an IVP under the assumptions that $f$ is continuous in $t$ and Lipschitz continuous in $x$. For more details see Theorem \ref{picard_thm} and \cite{teschlordinary}. I will be implicitly assuming these assumptions for the rest of the paper so that all the calculations are well-defined.\\
+The Picard–Lindel\"{o}f Theorem guarantees the existence and uniqueness of a solution $x$ to an IVP under the assumptions that $f$ is continuous in $t$ and Lipschitz continuous in $x$. For more details see Theorem \ref{picard_thm} and \cite{teschlordinary}. I will be implicitly assuming that these assumptions hold for the rest of the paper so that all the calculations are well-defined.\\
 An interesting example of initial value problem is the following. Its importance will be understood once the notion of absolute stability is presented in Section \ref{Abs stability}. 
 \begin{ex}\label{ex_1}
 Consider the following IVP:
@@ -701,23 +715,21 @@ Often in numerical analysis it is common practice to discretize time. From now o
     t_n := a + n h \tx{for} n \in \left\{0, \,\dots , \left\lfloor \frac{b-a}{h} \right\rfloor\right\}
 \end{equation}
 For clarity, I will set $x_n := x(t_n) = x(a + n h)$ and I will denote $y_n$ as the approximation of $x_n$ given by a numerical method.\\
-
-We are finally ready to talk about numerical methods for ordinary differential equations. These become more complex numerical method compared to integration since an error in the beginning may lead to a much bigger error further down the line. For this reason, the stability analysis becomes more important and complicated than before. We start with the Euler methods with are the easiest and simplest methods for solving IVPs.
+We are finally ready to talk about numerical methods for ordinary differential equations. These become more complex compared to integration since an error in the beginning may lead to "snowball effect" and so a much bigger error further down the line. For this reason, the stability analysis becomes more important and complicated than before. We start with the Euler methods which are the easiest and simplest methods for solving IVPs.
 
 %----------------euler methods for IVP--------------
 \subsection{Euler methods}
+The simplest methods for solving IVPs are the Euler methods. These are derived directly from approximating the derivative with the difference quotient. 
 \textbf{Explicit Euler}: The relation of the explicit Euler method is as follows
 \begin{equation}\nonumber
     y_{n+1} = y_n + h f(t_n, y_n), \quad y_0 = x_0
 \end{equation}
-TODO: trunction error
 
 \textbf{Implicit Euler}: The implicit Euler method is similar to the previous with a slight variation
 \begin{equation}\nonumber
     y_{n+1} = y_n + h f(t_{n+1}, y_{n+1}), \quad y_0 = x_0
 \end{equation}
-
-TODO: trunction error
+I will not present the derivation and error analysis of these methods as the computation are fairly straight forward.
 %----------------trap method for IVP--------------
 \subsection{Trapezoidal Method}
 Recalling  equation \eqref{Integral_ODE}, by discretizing time we have that at time $t_{n+1}$
@@ -728,27 +740,31 @@ Now applying $T_1(f)$ from equation \eqref{def_trap_single_interval} to the inte
 \begin{equation}\label{trap_method_for_ode}
     y_{n+1} = y_n + \frac{1}{2}h(f(t_n, y_n) + f(t_{n+1}, y_{n+1})) \tx{and} y_0 = x_0
 \end{equation}
-Now we have a way of calculating the next value of $x$ given the current point. When applying this method one usually computes the value for many steps to get an idea of the shape of the unknown function. Lucky for us, we have already done all the calculation needed to calculate the truncation error in Theorem \ref{thm_trap_error_1_interval} and we get that, for all $n>0$, there exists some $\xi_n \in [a,b]$
+
+Now we have a formula for computing the next step of our method. When applying this method one usually computes the value for many steps to get an idea of the shape of the unknown function.\\
+To begin our error analysis, we start with the notion of \textit{local truncation error}. To put it simply the local truncation error of a numerical method is the error we accumulate by interpolating the function $f$. In section \ref{global_local_error} I provide an alternative but equivalent definition of this quantity which is easier to generalize. Since our derivations start from the polynomial interpolation of the function, it is easier to work with the first definition. Lucky for us, we have already done all the calculations needed to calculate the \textit{truncation error} of this method in Theorem \ref{thm_trap_error_1_interval} and we get that, for all $n>0$, there exists some $\xi_n \in [a,b]$
 \begin{equation}\nonumber
     E_{t_n}^{Trap} = -\frac{1}{12}h^3f''(\xi_n,x(\xi_n)) = -\frac{1}{12}h^3x'''(\xi_n)
 \end{equation}
-This truncation error is the error of a single step and it turns out to be of order $O(h^3)$. When a method has truncation error of order $p+1$ (i.e. $O(h^{p+1})$) then we say that the method is of order $p$ since, under regularity assumptions, Theorem \ref{convergence_with_zero_stability} states that the global error will be of order $p$. In this case the trapezoid method is of order 2. 
+
+This truncation error is the error of a single step and it turns out to be of order $O(h^3)$. When a method has truncation error of order $p+1$ (i.e. $O(h^{p+1})$) then we say that the method is of order $p$. Theorem \ref{convergence_with_zero_stability} will provide justification of this definition. In this case the trapezoid method is of order 2.
 As we can see from \eqref{trap_method_for_ode} this is an implicit method, that is, to find the value of $y_{n+1}$ we must solve an equation. Depending on $f$ this is easier said than done, and the method we use to solve the equation might have an impact on the accuracy of our numerical solution. This will be discussed further in Section \ref{discussion_trap}.\\
-{\color{white}-}\\
-To illustrate the trapezoid method at work we can apply it to Example \ref{ex_1} and we get the following plot.
-\vspace{-2.5mm}
-\begin{center}
+To illustrate the trapezoid method at work we can apply it to Example \ref{ex_1} and we get the plot in Figure \ref{fig:trap_example}.
+\begin{figure}[h]
+    \centering
     \includegraphics[width=0.8\textwidth]{Images/Trap example 1.png}
-\end{center} 
+    \caption{Trapezoidal method when solving $x'(t) = -2x$, $x(0) = 3$}
+    \label{fig:trap_example}
+\end{figure}
 
 
 
 %---------------------------Adams-bashforth----------------------------------
 
 \subsection{Adams-Bashforth Method}
-It has become common practice in this paper to start deriving numerical methods starting from a polynomial interpolation. This method is no exception. The derivation of the Adams-Bashforth method is reminiscent of what we did for the trapezoid method and in fact there is a derivation starting from the trapezoid method. Nevertheless, I will again start from polynomial interpolation.
+It has become common practice in this paper to start deriving numerical methods starting from a polynomial interpolation. This method is no exception. The derivation of the Adams-Bashforth method is reminiscent of what we did for the trapezoidal method and in fact there is a derivation starting from the trapezoidal method. Nevertheless, I will again start from polynomial interpolation.
 
-We first discretize time into many steps of size $h$. Then, for ease, of notation set $g(t) = f(t,x(t))$ and take the interpolating polynomial of $g$ at the points $t_{n-1}$ and $t_n$
+We first discretize time into many steps of size $h$. Then, for ease of notation set $g(t) = f(t,x(t))$ and take the interpolating polynomial of $g$ at the points $t_{n-1}$ and $t_n$
 \begin{equation}\nonumber
     p(x) = \frac{x-t_{n-1}}{t_n-t_{n-1}} g(t_n) + \frac{t_n-x}{t_n-t_{n-1}} g(t_{n-1})
 \end{equation}
@@ -764,7 +780,7 @@ To find the truncation error we again start from Theorem \ref{Err_interpolation_
 \begin{equation}\nonumber
     E_{t_n}^{AB} := \int_{t_n}^{t_{n+1}}g(s)\,ds - \int_{t_n}^{t_{n+1}}p(s)\,ds = \int_{t_n}^{t_{n+1}}\frac{g''(\eta_s)}{2}(s-t_{n-1})(s-t_n)\,ds
 \end{equation}
-Then using Theorem \ref{Gen_IMVT} and computation, for some $\xi_n \in [t_{n},t_{n+1}] $
+Then using Theorem \ref{Gen_IMVT} and some computations, for some $\xi_n \in [t_{n},t_{n+1}] $ we have that
 \begin{equation}\nonumber
     \begin{split}
         \int_{t_n}^{t_{n+1}}\frac{g''(\eta_s)}{2}(s-t_{n-1})(s-t_n)\,ds & = \frac{g''(\xi_n)}{12}(t_{n+1} - t_n)^2(t_n + 2t_{n+1} - 3t_{n-1})=\\ & = \frac{5}{12}h^3g''(\xi_n)
@@ -779,16 +795,18 @@ Starting from \eqref{Integral_ODE} and recalling that $g(t) = f(t, y)$ we get
 To start the recursion we also need $y_1$. The simplest way to do this is to use Euler's method to give the first value.
 If we try and apply this method to Example \ref{ex_1} we get
 \vspace{-2.5mm}
-\begin{center}
+\begin{figure}[h]
+    \centering
     \includegraphics[width=0.8\textwidth]{Images/AB example 1.png}
-\end{center} 
+    \caption{Adams-Bashforth method applied to $x'(t) = -2x$, $x(0) = 3$}
+\end{figure}
 
 %---------------------------Runge-Kutta----------------------------------
 
 
 \subsection{Runge-Kutta of fourth order (RK4)}\label{Runge_kutta_sec}
 %https://lpsa.swarthmore.edu/NumInt/NumIntFourth.html
-The Runge-Kutta methods are of a whole family of methods, nonetheless I will only present the Runge-Kutta method of fourth degree which is the most popular. I will not however present the derivation and jump immediately to the analysis.
+The Runge-Kutta methods are of a whole family of methods, nonetheless I will only present the Runge-Kutta method of fourth degree which is the most popular. I will not present the derivation and jump immediately to the analysis.
 The method is best written as
 \begin{align}\nonumber
     k_1 &= f(t_n,y_n)\\ \nonumber
@@ -806,14 +824,16 @@ For a more intuitive description, let's understand what the various $k$'s mean.
     \item Taking inspiration from Simpson's method for approximating integrals we get the last equation.
 \end{itemize}
 The last point justifies the fact that this method, like Simpson's method in Section \ref{Simp_section}, has a truncation error of fifth order $O(h^5)$, and so is considered of fourth order.\\
-The last equation can also be seen as a weighted average of the slopes that we calculated in the previous steps. With this perspective in mind, we notice that the slope at the middle points, denoted $k_2$ and $k_3$, have a higher weight compared to the other two slopes. If we go back to the derivation of Simpson's method we can see why this would be the case. When we interpolate the function $f$, by construction the interpolant agrees exactly with the function at the midpoint and the extrema of the subinterval. If the subinterval is small enough and the function is sufficiently smooth it wouldn't be so far-fetched to say that the slopes of $f$ and the polynomial are similar at the midpoint. This comes from the fact that the function cannot vary too drastically inside the subinterval we are considering because of the regularity we are assuming. Furthermore, at the extrema even though the function and the polynomial start at the same point, they may have very different slopes because in the interpolation over a single subinterval we do not consider any information we have about the function outside the subinterval. Actually, using spline interpolation there is no guarantee that we can even differentiate the interpolating polynomial at the extrema of the subinterval. The Jupyter Notebook in \cite{Barbiere_Numerical_Method_for} illustrates an example of this.
+The last equation can also be seen as a weighted average of the slopes that we calculated in the previous steps. With this perspective in mind, we notice that the slope at the middle points, denoted $k_2$ and $k_3$, have a higher weight compared to the other two slopes. If we go back to the derivation of Simpson's method we can see why this would be the case. When we interpolate the function $f$, by construction the interpolant agrees exactly with the function at the midpoint and the extrema of the subinterval. If the subinterval is small enough and the function is sufficiently smooth it wouldn't be so far-fetched to say that the slopes of $f$ and the polynomial are similar at the midpoint. This comes from the fact that the function cannot vary too drastically inside the subinterval we are considering because of regularity. Furthermore, at the extrema even though the function and the polynomial agree, they may have very different slopes because in the interpolation over a single subinterval we do not consider any information we have about the function outside the subinterval. Actually, using spline interpolation there is no guarantee that we can even differentiate the interpolating polynomial at the extrema of the subinterval. The Jupyter Notebook in \cite{Barbiere_Numerical_methods_for} illustrates an example of this.
 
-When we apply Example \ref{ex_1} to RK4 we are left with the following plot
+When we apply Example \ref{ex_1} to RK4 we are left with the following plot.
 
 \vspace{-2.5mm}
-\begin{center}
+\begin{figure}[h]
+    \centering
     \includegraphics[width=0.8\textwidth]{Images/RK4 example 1.png}
-\end{center}  
+    \caption{Runge-Kutta of fourth order method applied to $x'(t) = -2x$, $x(0) = 3$}
+\end{figure}
 %Adavnateges and disadavntages: https://testbook.com/maths/runge-kutta-4th-order
 
 %---------------------------Stability analysis LMM-----------------------------
@@ -821,9 +841,7 @@ When we apply Example \ref{ex_1} to RK4 we are left with the following plot
 
 
 \section{Stability Analysis of Linear Multistep methods}
-Most of the methods we have seen thus far are all examples of linear multistep methods with the only exception being the Runge-Kutta method. This is an important distinction to make as it affects how we perform the stability analysis. In this section I will focus on linear multistep methods, therefore all the definition will be tailored to these kinds of methods. Nevertheless, all the derivations and explanations behind the definitions are presented in such a way that they can easily be adapted to other types of methods. We will see this in actions when we analyse the Runge-Kutta method in Section \ref{RK4_stab_sec}.
-
-{\color{white}-}\\
+Most of the methods we have seen thus far are all examples of linear multistep methods with the only exception being the Runge-Kutta method. This is an important distinction to make as it affects how we perform the stability analysis. In this section I will focus on linear multistep methods, therefore all the definition will be tailored to these kinds of methods. Nevertheless, all the derivations and explanations behind the definitions are presented in such a way that they can easily be adapted to other types of methods. We will see this in actions when we analyse the Runge-Kutta method in Section \ref{RK4_stab_sec}.\\
 A general \textit{r-step linear multistep method} is a method of the form
 \begin{equation}\label{LMM}
     \sum_{j=0}^r\alpha_jy_{n+j} = h\sum_{j=0}^r\beta_jf(t_{n+j}, y_{n+j})
@@ -839,7 +857,7 @@ To get Adams-Bashforth seen in equation \eqref{AB_method}, with a slight change 
 
 %---------------------------global and local trunc error------------------------------
 
-\subsection{Global and Local truncation error}
+\subsection{Global and Local truncation error}\label{global_local_error}
 To start analysing the stability of linear multistep methods we first want to quantify the error our methods make. Errors are inevitable when we try to approximate an analytical solution, however we would like to make sure that these errors remain under control and go to zero as our step size goes to zero.
 The first type of error we are interested in is the \textit{global (truncation) error} which is defined as the exact solution minus the numerical approximation
 \begin{equation}\nonumber
@@ -849,7 +867,7 @@ This notion is important as it leads to the definition of \textit{convergence}.
 \begin{df}[Convergence]
     We say a numerical method is convergent if, for every initial value problem \eqref{IVP},
     \begin{equation}
-        e_n = y(t_n) - y_n \to 0 \tx{as} h \to 0 \tx{for all} t_n \in [a, b]
+        e_n = y(t_n) - y_n \to 0 \tx{as} n \to \infty \tx{for all} t_n \in [a, b]
     \end{equation}
 \end{df}
 Notice that this definition is not restricted to linear multistep methods and is valid for general numerical methods.\\
@@ -933,8 +951,8 @@ which is exactly like saying that $k$ must be a root of $\rho(\zeta)$. What's mo
 \begin{equation}\nonumber
     y_n = \sum_{j=1}^rc_j\zeta_j^{n}
 \end{equation}
-where $\zeta_j$ for $j = 1,\dots,r$ are the roots of $\rho(\zeta)$. To solve for the coefficients we must use the initial conditions. To start the recurrence we need $r$ initial conditions so we have enough starting information to solve for the $r$ coefficients which leaves us with a $r \times r$ system of equations.
-A first idea of stability could be imposing that $y_n$ should not diverge as $n \to \infty$. For this be to fulfilled we must have that $|\zeta_j| \leq 1$ for all the roots. There is a slight catch if the roots repeat as the system to solve for the initial conditions becomes singular and so we must impose that $|\zeta_j| < 1$ if $\zeta_j$ is a repeated root to mend this. A more precise explanation of this may be found at \cite{leveque2007finite}.
+where $\zeta_j$ for $j = 1,\dots,r$ are the roots of $\rho(\zeta)$. To solve for the coefficients we must use the initial conditions. To start the recurrence we need $r$ initial conditions so we can construct a $r \times r$ system of equations.
+A first idea of stability could be imposing that $y_n$ should not diverge as $n \to \infty$. For this be to fulfilled we must have that $|\zeta_j| \leq 1$ for all the roots. There is a slight catch if the roots repeat as the system to solve becomes singular and so we must impose that $|\zeta_j| < 1$ if $\zeta_j$ is a repeated root to mend this. A more precise explanation of this may be found at \cite{leveque2007finite}.
 
 All of this reasoning is the motivation for defining zero-stability.
 \begin{df}[zero-stability for linear multistep methods]
@@ -956,7 +974,7 @@ Moreover, if the solution $x \in C^{\,p+1}([a,b])$ and local truncation error is
 \end{thm}
 
 \begin{proof}
-    The proof of this theorem can be found in \cite{gautschi2011numerical}
+    The proof of this theorem is very intricate and can be found in \cite{gautschi2011numerical}.
 \end{proof}
 % \begin{proof}
 % %see suli and mayers book
@@ -964,9 +982,8 @@ Moreover, if the solution $x \in C^{\,p+1}([a,b])$ and local truncation error is
 % on page 244 of P. Henrici, Discrete Variable Me
 % \end{proof}
 
-This theorem provides theoretical guarantees that for $h$ small enough and if the method is consistent we will converge to the correct result, which is as good as we would have hope for numerical methods. Let's apply our theory to some numerical methods to see if they eventually converge to the correct result.
-{\color{white}-}\\
-Zero-stability however is not the only kind of stability we care about. In fact often this stability is not useful. These condition basically tell us that "eventually" for $h$ small enough we will be very close to the exact answer. How small does $h$ have to be for us to be arbitrarily close to the correct value? Actually, it can also happen that for values of $h$ not small enough the error is extremely large. Essentially there are no guarantees that a given $h$ will give a small error. To dive deeper into stability analysis we will introduce absolute stability.
+This theorem provides theoretical guarantees that for $h$ small enough and if the method is consistent we will converge to the correct result, which is as good as we would have hope for numerical methods.\\
+Zero-stability however is not the only kind of stability we care about. In fact often this stability is not useful. These condition basically tell us that "eventually" for $h$ small enough we will be very close to the exact answer. How small does $h$ have to be for us to be arbitrarily close to the correct value? Actually, it can also happen that for values of $h$ not small enough the error is extremely large. Essentially there are no guarantees that a given $h$ will give a small error. To dive deeper into stability analysis we will introduce \textit{absolute stability}.
 
 %---------------------------Abs stability-------------------------------
 
@@ -975,13 +992,13 @@ This notion of stability focuses on a specific linear example of ODE. We will ca
 \begin{equation} \label{test_ODE}
     x'(t) = \lambda x(t) 
 \end{equation}
-While this equation seems extremely simple, by varying $\lambda$ we can really put to the test many of the methods we have seen. If we take one step further we can even take $\lambda$ to be complex allowing us to visualize regions of absolute stability in the complex plane. Why do we care so much about equation \eqref{test_ODE} which has a very simple solution $Ce^{\lambda t}$? Firstly, it can be generalized to include linear system of differential equations. In this case all we have to do is calculate the eigenvalues of the matrix representing the system and we can apply absolute stability to each eigenvalue in order to conclude absolute stability over the whole system. Actually it can be even generalized to non-linear systems, by taking a linear approximation of the function and applying the same idea as for linear system of differential equations. The second reason for its importance is that this is the simplest example of what's called a stiff differential equation. A stiff differential equation causes many numerical methods to behave unstably if $h$ is not chosen small enough. If, for example, we take $\lambda$ to be very large, then the step the numerical method makes is multiplied by $\lambda$ and might lead to the numerical method overshooting the real value. This is clearly seen in  Example \ref{ex_1} applied to AB2 when $h = 0.5$. So the numerical method will have a hard time converging to the correct result. We notice that this can be mitigated by choosing $h$ small enough so to counteract the impact $\lambda$ has on the method.
+While this equation seems extremely simple, by varying $\lambda$ we can really put to the test many of the methods we have seen. If we take one step further and take $\lambda$ to be complex we can visualize regions of absolute stability in the complex plane. Why do we care so much about equation \eqref{test_ODE} which has a very simple solution $Ce^{\lambda t}$? Firstly, it can be generalized to include linear system of differential equations. In this case all we have to do is calculate the eigenvalues of the matrix representing the system and we can apply absolute stability to each eigenvalue in order to conclude absolute stability over the whole system. Actually it can be even generalized to non-linear systems, by locally linearising the system and applying the same idea as for linear system of differential equations. The second reason for its importance is that this is the simplest example of what's called a stiff differential equation. If, for example, we take $\lambda$ to be very large, then the step the numerical method makes is multiplied by $\lambda$ and might lead to an overshooting of the real value. Hence the test equation causes many numerical methods to behave unstably if $h$ is not chosen small enough impacting their convergence to the correct value. This is clearly seen in  Example \ref{ex_1} applied to AB2 when $h = 0.5$. We notice that this can be mitigated by choosing $h$ small enough so to counteract the impact $\lambda$ has on the method.
 For example applying the explicit Euler method to \eqref{test_ODE} gives
 \begin{equation}\label{euler_abs_stab}
     y_{n+1} = (1+h\lambda)y_n
 \end{equation}
 For the explicit Euler method to be absolutely stable we must have that $|1+h\lambda|\leq 1$. Note that while $\lambda$ is complex we still take $h$ to be real. It is evident that the important aspect here is the product of $h$ and $\lambda$. This is perfectly inline with what we discussed above since taking $h$ small can reduce the effect of $\lambda$. So the important aspect to monitor is the product $\lambda h$ and it is precisely this that we are going to plot to find what is called the \textit{absolute stability regions} of the numerical methods.\\
-In the explicit Euler the stability region comes out to be a circle of radius 1 centred at $(-1,0)$ as we can see in Section \ref{particular case euler section}.\\
+In the case of explicit Euler the stability region comes out to be a circle of radius 1 centred at $(-1,0)$ as we can see in Section \ref{particular case euler section}.\\
 
 
 %---------------------------Abs stability for LMM-------------------------------
@@ -994,7 +1011,7 @@ Similar to the previous example, the important parameter to consider is the prod
 \begin{equation}\nonumber
     \pi(\zeta;z)=\rho(\zeta)-z\sigma(\zeta)
 \end{equation}
-Where $\pi(\zeta;z)$ is a polynomial in $\zeta$ whose coefficients depend on $z$. The essential point in this argument is that equation \eqref{difference_equation_abs_stab} is identical to equation \eqref{difference_equation} with slightly different coefficients. Using the exact argument we did in Section \ref{zero_stab_section} with $\pi(\zeta;z)$ instead of $\rho(\zeta)$ we get another kind of stability: \textit{Absolute stability}.
+Where $\pi(\zeta;z)$ is a polynomial in $\zeta$ and whose coefficients depend on $z$. The essential point in this argument is that equation \eqref{difference_equation_abs_stab} is identical to equation \eqref{difference_equation} with slightly different coefficients. Using the exact argument we did in Section \ref{zero_stab_section} with $\pi(\zeta;z)$ instead of $\rho(\zeta)$ we get another kind of stability: \textit{Absolute stability}.
 \begin{df}[Absolute stability]
     A r-step linear multistep method is said to be absolutely stable if the roots of the stability polynomial $\pi(\zeta;z)$ denoted $\zeta_1, \dots , \zeta_r$ satisfy the following conditions:
     \begin{align}
@@ -1007,39 +1024,44 @@ We are now ready to plot some stability regions of some numerical methods.
 
 %---------------------------euler method case-------------------------------
 \subsection{Particular case: Euler Methods}\label{particular case euler section}
-The explicit and implicit Euler methods are one of the simplest linear multistep methods there is.\\
-{\color{white}-}\\
 \textbf{Explicit Euler}:
-This formula gives rise to the following characteristic polynomials
+We are left with the following characteristic polynomials
 \begin{equation}\label{char_poly_exp_ee}
     \rho_{EE}(\zeta) = -1 + \zeta \tx{and} \sigma_{EE}(\zeta) = 1
 \end{equation}
 Where $\rho_{EE}(\zeta)$ has a single root namely $\zeta_1=1$. As the conditions \eqref{consistent_conditions} are satisfied we conclude that the explicit Euler method is zero-stable and consistent which, by the previous theorem, is equivalent to being convergent.\\
 {\color{white}-}\\
 \textbf{Implicit Euler}: 
-Which has the following characteristic polynomials
+This method has the following characteristic polynomials
 \begin{equation}\label{char_poly_exp_ie}
     \rho_{IE}(\zeta) = -1 + \zeta \tx{and} \sigma_{IE}(\zeta) = \zeta
 \end{equation}
 Where $\rho_{IE}(\zeta)$ has a single root $\zeta_1=1$. Similarly to the explicit Euler method also the implicit Euler is zero-stable and consistent, which is to say convergent.\\
-
 We have already seen the derivation for the stability region of the explicit Euler method. Deriving the implicit Euler method stability region is very similar.\\
-\begin{minipage}[b]{.5\textwidth}
-    \includegraphics[width=\textwidth]{Images/Stab region of Explicit Euler.png}
-\end{minipage}%
-\begin{minipage}[b]{.5\textwidth}
-    \includegraphics[width=\textwidth]{Images/Stab region of Implicit Euler.png}
-\end{minipage}%
+\begin{figure}[h]
+    \centering
+    \caption{Absolute stability regions for the Euler methods}
+    \begin{subfigure}{.5\textwidth}
+        \centering
+         \includegraphics[width=\textwidth]{Images/Stab region of Explicit Euler.png}
+        \caption{Explicit Euler method}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/Stab region of Implicit Euler.png}
+        \caption{Implicit Euler method}
+    \end{subfigure}
+\end{figure}
 
 \subsubsection{Discussion of the Euler methods}
-Euler methods come out naturally from approximating the derivative using the difference quotient which implies that they are as simple as one can get. Their simplicity means that it takes very little computational power to run as we are only calling the function once (which might become be expensive for complicated functions) and performing basic operations. This simplicity however comes at a cost of instability. Just by looking at the stability region of the explicit Euler method. This means that $h$ must be chosen very well to avoid instability and often $h$ might have to be so small that the number of computations needed to become too large. Often computers have trouble dealing with very small numbers as this will likely lead to floating point number approximations.
+Euler methods come out naturally from approximating the derivative using the difference quotient. Their simplicity means that it takes very little computational power to run as we are only calling the function once (which might become be expensive for complicated functions) and performing basic operations. This simplicity however comes at a cost of instability. Just by looking at the stability region of the explicit Euler method. This means that $h$ must be chosen very well to avoid instability and often $h$ might have to be so small that the number of computations needed may become too large. Often computers have trouble dealing with very small numbers as this will likely lead to floating point number approximations.
 {\color{white}-}\\
-Backwards Euler on the other hand does not suffer from a small stability region, however slow convergence and the high chance of low accuracy remain very prominent issues. Furthermore, it is an implicit method which comes with some serious drawback as we shall see in the discussion of the trapezoidal method, Section \ref{discussion_trap}.
+Backwards Euler on the other hand does not suffer from a small stability region. Nevertheless, slow convergence and the high chance of low accuracy remain very prominent issues. Furthermore, it is an implicit method which comes with some serious drawback as we shall see in the discussion of the trapezoidal method, Section \ref{discussion_trap}.
 
 %---------------------------trap method case-------------------------------
 
 \subsection{Particular case: Trapezoidal method for IVPs}
-From \eqref{trap_parameters} we clearly see that the trapezoidal method is a consistent method. Now to check if the method is zero-stable let's first find it's characteristic polynomials.
+To check if the method is zero-stable let's first find it's characteristic polynomials.
 \begin{equation}\label{char_poly_trap}
     \rho_{T}(\zeta) = -1 + \zeta \tx{and} \sigma_T(\zeta) = \frac{1}{2} + \frac{1}{2}\zeta
 \end{equation}
@@ -1058,12 +1080,14 @@ and taking the absolute value we get
 \end{equation}
 which is like saying all the complex numbers $z$ that are closer to $-2$ than to $2$, giving us the left half plane as below.
 \vspace{-2.5mm}
-\begin{center}
+\begin{figure}[h]
+    \centering
     \includegraphics[width=0.5\textwidth]{Images/Stab region of Trapezoidal Method.png}
-\end{center}  
+    \caption{Absolute stability region for the trapezoidal method}
+\end{figure}
 
 \subsubsection{Discussion of the Trapezoidal method}\label{discussion_trap}
-The trapezoidal method that came directly from the trapezoid method for numerical integration. The remarkable property of this method is the fact that its stability region is the half plane. It turns out that it is impossible to have an explicit method with this property and what's more the only linear multistep method that achieves this must have order at most 2. The trapezoidal method turns out to be the most accurate among all of these. The most evident problem of this method however is the fact that we need to solve an equation (that depends on f) to implement the step. Solving equations numerically is a whole other branch of numerical analysis, however all we really care about it that solving equations numerically may bring with them error that were not accounted for in the analysis of the trapezoidal method. Furthermore, implicit methods also need more initial points to start the calculation. Often this is done by using very simple methods to get the first few points such as the Euler methods. The problem is that this may lead to possible errors in the starting conditions, which is obviously not ideal. Luckily we introduced zero-stability to make sure this error does not explode, but still errors in the starting conditions may propagate through the steps and end up hurting our final accuracy.
+The trapezoidal method came directly from the trapezoid method for numerical integration. The remarkable property of this method is the fact that its stability region is the half plane. It turns out that it is impossible to have an explicit method with this property and, what's more, the only linear multistep method that achieves this must have order at most 2. The trapezoidal method turns out to be the most accurate among all of these. The most evident problem of this method however is the fact that we need to solve an equation (that depends on f) to implement the step. Solving equations numerically is a whole other branch of numerical analysis, however all we really care about it that solving equations numerically may bring with them errors that were not accounted for in the error analysis. Furthermore, implicit methods also need more initial points to start the calculation. Often this is done by using very simple methods to get the first few points such as the Euler methods. The problem is that this may lead to possible errors in the starting conditions, which is obviously not ideal. Luckily we introduced zero-stability to make sure this error does not explode, but still errors in the starting conditions may propagate through the steps and end up hurting our final accuracy.
 
 %---------------------------Ab case----------------------------------
 \subsection{Particular case: Adams-Bashforth}
@@ -1077,21 +1101,30 @@ The stability polynomial of the Adams-Bashforth method of order 2 is
     \pi_{AB}(\zeta;z) =  \frac{1}{2}z + \left(-\frac{3}{2}z-1\right)\zeta + \zeta^2
 \end{equation}
 
-In this case checking the root condition may become complicated, and more so for higher orders. In this case we can resort to the computer programs which display the region of stability of the various methods. Thanks to the construction of the stability polynomial it is very easy to generalize the program to Adams-Bashforth of any order. Below I illustrate the stability regions for the Adams-Bashforth methods up to order 5.\\
-\begin{minipage}[b]{.5\textwidth}
-    \includegraphics[width=\textwidth]{Images/Stab region of AB2.png}
-\end{minipage}%
-\begin{minipage}[b]{.5\textwidth}
-    \includegraphics[width=\textwidth]{Images/Stab region of AB Methods.png}
-\end{minipage}%
+In this case checking the root condition may become complicated, and more so for higher orders. In this case we can resort a computer to display the region of stability. Thanks to the construction of the stability polynomial it is very easy to generalize the program to Adams-Bashforth of any order. Below I illustrate the stability regions for the Adams-Bashforth methods up to order 5.\\
+\begin{figure}[h]
+    \centering
+    \caption{Absolute stability regions for the Adams-Bashforth methods}
+    \begin{subfigure}{.5\textwidth}
+        \centering
+         \includegraphics[width=\textwidth]{Images/Stab region of AB2.png}
+        \caption{Adams-Bashforth of order 2}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/Stab region of AB Methods.png}
+        \caption{Adams-Bashforth of order 2 through to order 5}
+    \end{subfigure}
+    
+\end{figure}
 
 \subsubsection{Discussion of the Adams-Bathforth method}
-After having slightly varied the derivation of the trapezoidal method we discovered another method: Adams-Bashforth (which actually belongs to a whole family of methods). This method is particularly interesting as it only uses one extra function call to gain compared to the explicit Euler method, but the improvement is quite substantial. Despite this if we try to use higher order AB methods we see that the stability region becomes extremely small leading to a very high chance of instability.
+After having slightly varied the derivation of the trapezoidal method we discovered another method: Adams-Bashforth (which belongs to a whole family of methods). This method is particularly interesting as it only uses one extra function call compared to the explicit Euler method, but the improvement is quite substantial. Despite this if we try to use higher order AB methods we see that the stability region becomes extremely small leading to a very high chance of instability.
 
 
 %-----------------Stab analyis of RK4----------------------
 \section{Stability Analysis of Runge-Kutta of fourth order}\label{RK4_stab_sec}
-We now move on to the stability of the Runge-Kutta of fourth order. Here I present the derivation only for the fourth order method, but the reasoning can be generalized. The ideas behind zero-stability and absolute stability are carried over also to this method but we need a slightly different approach. For example, it is clear from Section \ref{Runge_kutta_sec} that if we apply the RK4 method to the differential equation behind the definition of zero-stability (Example \ref{zero_stab_example}) we observe that we get the correct solution with no chance of diverging, so the RK4 method is trivially zero-stable.
+We now move on to the stability of the Runge-Kutta of fourth order. Here I present the derivation only for the fourth order method, but the reasoning can be generalized. The ideas behind zero-stability and absolute stability are carried over also to this method but we need a slightly different approach. For example, it is clear from Section \ref{Runge_kutta_sec} that if we apply the RK4 method to the differential equation behind the definition of zero-stability (Example \ref{zero_stab_example}) we observe that we get the correct solution with no chance of diverging, so the RK4 method is zero-stable.
 
 In the footsteps of absolute stability for multistep methods, we will also apply RK4 to the differential equation defined as
 \begin{equation}\label{test_ODE_abs_stab}
@@ -1114,24 +1147,31 @@ Using $z = \lambda h $ as above, let us define
     R(z) := 1 + z + \frac{z^2}{2!} + \frac{z^3}{3!} + \frac{z^4}{4!}
 \end{equation}
 Similarly to how we analysed the absolute stability of the explicit Euler method in equation \eqref{euler_abs_stab}, for the RK4 method to be absolutely stable we need that the coefficient of $y_n$ does not blow up to infinity, which is to say $|R(z)| \leq 1$. Plotting this inequality similarly to what we did with the other methods results in the following graph.
-
-\begin{minipage}[b]{.5\textwidth}
-    \includegraphics[width=\textwidth]{Images/Stab region of RK4.png}
-\end{minipage}%
-\begin{minipage}[b]{.5\textwidth}
-    \includegraphics[width=\textwidth]{Images/Stab region of RK Methods.png}
-\end{minipage}%
+\begin{figure}[h]
+    \centering
+    \caption{Absolute stability region for Runge-Kutta methods}
+    \begin{subfigure}{.5\textwidth}
+        \centering
+         \includegraphics[width=\textwidth]{Images/Stab region of RK4.png}
+        \caption{Runge Kutta method of fourth order}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Images/Stab region of RK Methods.png}
+        \caption{Runge Kutta of order 1 through to order 4}
+    \end{subfigure}
+    
+\end{figure}
 
 
 \subsection{Discussion of Runge-Kutta of fourth order}
-The RK4 method is a very good compromise between complexity and stability is the fourth order Runge-Kutta method. We can see that this method performs remarkably well in many examples and, taking special care in noticing the scale of the axes we observe that the RK4 method has a very large stability region. Moreover, we notice that in fact the stability regions gets bigger as we increase the order of the method as we can see in the picture above.  By not being a multistep method there is no need to estimate the first few points which means it is "self-starting". Ultimately what makes it powerful is the fact that it takes the weighted average of various slopes before taking the step. This makes it more robust and helps to lower any errors that may come up from calculating a single slope. All of this obviously comes at a cost. Usually RK4 takes more computational time than multistep method of comparable accuracy and this becomes more evident when we try to solve systems of ODEs. Lastly, the error estimation of the RK methods is quite messy and hard to analysis.
+The RK4 method is a very good compromise between complexity and stability. We can see that this method performs remarkably well in many examples and, taking special care in noticing the scale of the axes we observe that the RK4 method has a very large stability region. Moreover, we notice that in fact the stability regions gets bigger as we increase the order of the method.  By not being a multistep method there is no need to estimate the first few points which means it is "self-starting". Ultimately what makes it powerful is the fact that it takes the weighted average of various slopes before taking the step. This makes it more robust and helps to lower any errors that may come up from calculating a single slope. All of this obviously comes at a cost. Usually RK4 takes more computational time than multistep methods of comparable accuracy and this becomes more evident when we try to solve systems of ODEs. Lastly, the error estimation of the RK methods is quite messy and hard to analysis.
 
 \section{Concluding Remarks}
-Throughout this paper I have presented some of the simplest and most common numerical methods for solving ODEs each with its advantages and disadvantages. The reason why there are so many methods is that no method is perfect and ultimately choosing the best method may depend on the problem at hand.
-{\color{white}-}\\
-After having done of all this analysis a natural question comes up: why don't we use a method of higher order? This seems like a very reasonable question, in fact the stability region of the Runge-Kutta method seems to keep getting bigger, so why don't we just keep increasing the order?
-Well the first problem is that it is even very complicated just to come with the methods! Take the Runge-Kutta family for example, even though I did not present the derivation, the formula comes from solving a system of equations. To derive higher order methods the number of equations in the system essentially blows up. For example firth order RK would require sixteen equations. Actually in \cite{Ketcheson_2014} the authors point out that this can only be done efficiently up to order eight. %[Ketcheson and BinWaheed, 2014, p. 178]
-Even if it were possible to find any other higher order numerical method they usually become very complicated and harder to implement, which in turn brings with it more computation and so longer run times, not to mention the extremely complicated error analysis that would come with these methods. All of this effort would only bring a slight improvement to the best numerical methods we have so far. In most application often the accuracy of the methods we already have is sufficiently high and increasing the order of methods does not necessarily mean that they would be more stable. Take for example the Adams-Bashforth methods. So in summary, the effort of discovering and implementing higher order methods makes using higher order methods hard to justify.
+Throughout this paper I have presented some of the simplest and most common numerical methods for solving ODEs, each with its advantages and disadvantages. The reason why there are so many methods is that no method is perfect and ultimately choosing the best method may depend on the problem at hand.\\
+After having done of all this analysis, a natural question comes up: why don't we use a method of higher order? This seems like a very reasonable question, in fact the stability region of the Runge-Kutta method seems to keep getting bigger, so why don't we just keep increasing the order?
+Well the first problem is that it is even very complicated just to come with the higher order methods! Take the Runge-Kutta family for example, even though I did not present the derivation, the formula comes from solving a system of equations. To derive higher order methods the number of equations in the system blows up. For example fifth order RK would require sixteen equations. Actually in \cite{Ketcheson_2014} the authors point out that this approach to deriving higher order Runge-Kutta methods can only be done efficiently up to order eight. %[Ketcheson and BinWaheed, 2014, p. 178]
+Even if it were possible to find a other higher order numerical method they usually become very complicated and harder to implement, which in turn brings with it more computation and so longer run times, not to mention the extremely complicated error analysis that would come with it. All of this effort would only bring a slight improvement to the best numerical methods we have so far. In most applications the accuracy of the methods we already have is sufficiently high and increasing the order of methods does not necessarily mean that they would be more stable. Take for example the Adams-Bashforth methods. So in summary, the effort of discovering and implementation makes using higher order methods hard to justify.
 
 
 % Why not increase order?
