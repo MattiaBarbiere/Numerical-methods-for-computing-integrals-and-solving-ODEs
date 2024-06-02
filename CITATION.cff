@@ -2,7 +2,7 @@
 # Visit https://bit.ly/cffinit to generate yours today!
 
 cff-version: 1.2.0
-title: Numerical Methods for ODEs
+title: Numerical methods for computing integrals and solving ODEs
 message: >-
   If you use this software, please cite it using the
   metadata from this file.
@@ -14,14 +14,14 @@ authors:
 identifiers:
   - type: url
     value: >-
-      https://github.com/MattiaBarbiere/Numerical-Method-for-ODE-s/blob/main/Examples.ipynb
+      https://github.com/MattiaBarbiere/Numerical-methods-for-computing-integrals-and-solving-ODEs/blob/main/Methods.ipynb
     description: >-
       Python notebook with implementation of numerical
       methods
 repository-code: >-
-  https://github.com/MattiaBarbiere/Numerical-Method-for-ODE-s
+  https://github.com/MattiaBarbiere/Numerical-methods-for-computing-integrals-and-solving-ODEs
 abstract: >-
   Python notebook containing the implementation of numerical
-  methods presented as part of Mattia Barbiere bachelor
-  thesis of Mathematical and Computing science for
+  methods presented as part of Mattia Barbiere's bachelor
+  thesis as part of the degree of Mathematical and Computing Sciences for
   Artificial Intelligence at Bocconi University.
